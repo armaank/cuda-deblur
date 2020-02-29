@@ -2,7 +2,8 @@
 
 #include "gpuLucyRichardson.cu"
 #include "cpuLucyRichardson.cu"
-
+#include "benchmarks/metrics.c" 
+#include "benchmarks/gputime.h"
 
 #define NUM_ITERATIONS 100
 
@@ -13,6 +14,10 @@ int main(void)
     const uint W = 50000;
     const uint num_elements = H*W;
     const uint size = sizeof(float)*num_elements;
+
+    /* initalize gpu timers */
+    GpuTimer gputime_lucy;
+    GpuTimer gputime_gpu; // need a better name
 
     /* TODO: initialize h_f, h_g, h_c and read in an image value for h_c. h_g should be a gaussian, 
              and h_f I guess could be garbage. maybe a gaussian also?  */
@@ -44,7 +49,7 @@ int main(void)
 
     // Error code to check return values for CUDA calls
     cudaError_t err = cudaSuccess;
-
+    gputime_gpu.start()
     // Allocate the device input vector f
     float *d_f = NULL;
     err = cudaMalloc((void **)&d_f, size);
@@ -113,11 +118,17 @@ int main(void)
     }
 
     // TODO: time this loop, i guess?
+    /* 
+    maybe it's not a bad idea to use two timers. One that times the cpu and gpu lucy iterations, and 
+    one that times the entire process for cpu and gpu, that way we know what the overhead is and factor 
+    that into our analysis -armaan
+    */
+    gputime_lucy.start()
     for (int i=0; i<NUM_ITERATIONS; ++i)
     {
         GpuLucyRichIteration(d_c, d_g, d_f, d_tmp1, d_tmp2, W, H);
     }
-
+    gputime_lucy.stop()
 
     // Copy the device result vector in device memory to the host result vector in host memory.
     printf("Copy output data from the CUDA device to the host memory\n");
@@ -166,6 +177,10 @@ int main(void)
         fprintf(stderr, "Failed to free device vector tmp2 (error code %s)!\n", cudaGetErrorString(err));
         exit(EXIT_FAILURE);
     }
+    gputime_gpu.stop()
+    
+    fprintf(stdout, "Total time Elapsed - GPU: %g ms\n", gputime_gpu.elapsed_time)
+    fprintf(stdout, "Lucy Iteration time Elapsed - GPU: %g ms\n", gputime_lucy.elapsed_time)
 
     // TODO: Free host memory
 
