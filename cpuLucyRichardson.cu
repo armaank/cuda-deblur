@@ -108,7 +108,6 @@ void updateUnderlyingImg(const float *c, const float *g, float *f, float *tmp1, 
  * convolve - Computes the discrete convolution C=A*B. 
  * The dimensions of A, B, and C are all assumed to be W x H.
  */
-__global__
 void convolve(const float *A, const float *B, float *C, const uint W, const uint H)
 {
     const int max_val = H*W;
@@ -138,7 +137,6 @@ void convolve(const float *A, const float *B, float *C, const uint W, const uint
  * elementWiseDivision - Executes an elementwise division C = A/B.
  * The dimensions of A, B, and C are all assumed to be W x H.
  */
-__global__
 void elementWiseDivision(const float *A, const float *B, float *C, const uint W, const uint H)
 {
     const int max_val = H*W;
@@ -155,7 +153,6 @@ void elementWiseDivision(const float *A, const float *B, float *C, const uint W,
  * elementWiseMultiplication - Executes an elementwise multiplication C = A*B.
  * The dimensions of A, B, and C are all assumed to be W x H.
  */
-__global__
 void elementWiseMultiplication(const float *A, const float *B, float *C, const uint W, const uint H)
 {
     const int max_val   = H*W;
