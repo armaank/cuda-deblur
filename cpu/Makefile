@@ -1,11 +1,14 @@
+CC = g++ # compiler
+CXXFLAGS = -std=c++11 # flags
+
 make: cpuLucyRichardson.o
-	g++ main.cpp png_lib/lodepng.cpp cpuLucyRichardson.cpp
+	$(CC) $(CXXFLAGS)  main.cpp png_lib/lodepng.cpp cpuLucyRichardson.cpp
 
 debug: cpuLucyRichardson.o
-	g++ -g main.cpp png_lib/lodepng.cpp cpuLucyRichardson.cpp
+	$(CC) $(CXXFLAGS)  -g main.cpp png_lib/lodepng.cpp cpuLucyRichardson.cpp
 
 cpuLucyRichardson.o: cpuLucyRichardson.cpp cpuLucyRichardson.h
-	g++ -c cpuLucyRichardson.cpp
+	$(CC) $(CXXFLAGS)  -c cpuLucyRichardson.cpp
 
 clean:
 	rm cpuLucyrichardson.o a.out

@@ -57,26 +57,20 @@ int main(int argc, char **argv)
     /////////////////////////////////////////////////////////////////////////////////
     
     /* fcn. kernel/lucy richardson */
-    if ( cpuLucyRichardson(width, height, 5, input_image_proc, output_image_proc) < 0)
+    if ( cpuLucyRichardson(width, height, 100, input_image_proc, output_image_proc) < 0)
     {
         return -1; // error already printed to stderr
     }
-
-    // for (int i=0; i< 960*960*3; ++i)
-    // {
-    //     output_image_proc[i] = input_image_proc[i];
-    // }
 
     /////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////
     
     /* initialize output .png */
-
     std::vector<unsigned char> out_image;
     for (int i = 0; i < in_image.size(); ++i)
     {
-        out_image.push_back(input_image_proc[i]); // changed from output_image_proc
+        out_image.push_back(output_image_proc[i]); // changed from output_image_proc
         if ((i + 1) % 3 == 0)
         {
             out_image.push_back(MAX_PIXEL);

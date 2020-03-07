@@ -8,25 +8,40 @@
 #include <cstdlib>
 #include <cstdint>
 #include <cstring>
+#include <random>
+
 
 #define MAX_PIXEL 255
+
 
 /* function to perform lucy richardson deconvolution on the cpu only */
 int cpuLucyRichardson(unsigned W, unsigned H, int num_iter, unsigned char *image_input, unsigned char *image_output)
 {
-    unsigned char *psf  = new(std::nothrow) unsigned char[W*H*3];
-    unsigned char *tmp1 = new(std::nothrow) unsigned char[W*H*3];
-    unsigned char *tmp2 = new(std::nothrow) unsigned char[W*H*3];
+    const unsigned i_len = W*H*3;
+
+    unsigned char *psf  = new(std::nothrow) unsigned char[i_len];
+    unsigned char *tmp1 = new(std::nothrow) unsigned char[i_len];
+    unsigned char *tmp2 = new(std::nothrow) unsigned char[i_len];
     if (!psf || !tmp1 || !tmp2)
     {
         std::cerr << "Error allocating memory for the point spread function or temporary variables." << std::endl;
         return -1;
     }
+
+    /* initialize the psf as a gaussian */
+    std::default_random_engine generator;
+    std::normal_distribution<float> normal_dist(127, 100);
+    for (int i=0; i < i_len; )
+    {
+        float sample = normal_dist(generator);
+        if (sample < 0 || sample > MAX_PIXEL)
+            continue;
+
+        psf[i++] = static_cast<unsigned char>(std::round(sample)); 
+    }
     
     for (int i = 0; i < num_iter; ++i)
-    {
         CpuLucyRichIteration(image_input, psf, image_output, tmp1, tmp2, W, H);
-    }
     
     return 0;
 }
@@ -39,7 +54,7 @@ int cpuLucyRichardson(unsigned W, unsigned H, int num_iter, unsigned char *image
  *   H - Height of the image.
  *   W - Width of the image.
  */
-void CpuLucyRichIteration(const unsigned char * c, unsigned char *g, unsigned char *f, unsigned char *tmp1, unsigned char *tmp2, const unsigned W, const unsigned H)
+void CpuLucyRichIteration(const unsigned char *c, unsigned char *g, unsigned char *f, unsigned char *tmp1, unsigned char *tmp2, const unsigned W, const unsigned H)
 {
     updatePSF(c, g, f, tmp1, tmp2, W, H);
     updateUnderlyingImg(c, g, f, tmp1, tmp2, W, H);
@@ -51,7 +66,6 @@ void CpuLucyRichIteration(const unsigned char * c, unsigned char *g, unsigned ch
   */
 void updatePSF(const unsigned char *c, unsigned char *g, const unsigned char *f, unsigned char *tmp1, unsigned char *tmp2, const unsigned W, const unsigned H)
 {
-    // Launch the Vector Add CUDA Kernel
     convolve(g, f, tmp1, W, H);
 
     elementWiseDivision(c, tmp1, tmp2, W, H);
@@ -122,7 +136,7 @@ void elementWiseDivision(const unsigned char *A, const unsigned char *B, unsigne
     for (int c_idx = 0; c_idx < max_val; ++c_idx)
     {
         if (B[c_idx] == 0)  // not sure if this is technically correct, but for now..
-            C[c_idx] = 255;
+            C[c_idx] = MAX_PIXEL;
         else
             C[c_idx] = A[c_idx] / B[c_idx];
 
