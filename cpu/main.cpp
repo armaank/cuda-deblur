@@ -31,7 +31,7 @@ int main(int argc, char **argv)
         std::cerr << "error decoding input .png" << error << ": " << lodepng_error_text(error) << std::endl;
         return -1;
     }
-    
+
     /* convert data from rgba to rgb, init temporary arrays for processing */
     unsigned char *input_image_proc  = new(std::nothrow) unsigned char[(in_image.size() * 3) / 4];
     unsigned char *output_image_proc = new(std::nothrow) unsigned char[(in_image.size() * 3) / 4];
@@ -72,10 +72,11 @@ int main(int argc, char **argv)
     /////////////////////////////////////////////////////////////////////////////////
     
     /* initialize output .png */
+
     std::vector<unsigned char> out_image;
     for (int i = 0; i < in_image.size(); ++i)
     {
-        out_image.push_back(output_image_proc[i]);
+        out_image.push_back(input_image_proc[i]); // changed from output_image_proc
         if ((i + 1) % 3 == 0)
         {
             out_image.push_back(MAX_PIXEL);
