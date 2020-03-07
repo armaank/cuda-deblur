@@ -8,6 +8,7 @@
 
 #define MAX_PIXEL 255
 
+
 int main(int argc, char **argv)
 {
     const char *input_file = argv[1];
@@ -15,7 +16,7 @@ int main(int argc, char **argv)
     int num_iter = 10;
     if (argc <= 2)
     {
-        std::cout << "error: specify input and output files" << std::endl;
+        std::cerr << "error: specify input and output files" << std::endl;
         return -1;
     }
 
@@ -27,12 +28,19 @@ int main(int argc, char **argv)
     unsigned error = lodepng::decode(in_image, width, height, input_file);
     if (error)
     {
-        std::cout << "error decoding input .png" << error << ": " << lodepng_error_text(error) << std::endl;
+        std::cerr << "error decoding input .png" << error << ": " << lodepng_error_text(error) << std::endl;
+        return -1;
+    }
+    
+    /* convert data from rgba to rgb, init temporary arrays for processing */
+    unsigned char *input_image_proc  = new(std::nothrow) unsigned char[(in_image.size() * 3) / 4];
+    unsigned char *output_image_proc = new(std::nothrow) unsigned char[(in_image.size() * 3) / 4];
+    if (!input_image_proc || !output_image_proc)
+    {
+        std::cerr << "error allocating memory for input and output images." << std::endl;
+        return -1;
     }
 
-    /* convert data from rgba to rgb, init temporary arrays for processing */
-    unsigned char *input_image_proc = new unsigned char[(in_image.size() * 3) / 4];
-    unsigned char *output_image_proc = new unsigned char[(in_image.size() * 3) / 4];
     int pointer = 0;
     for (int i = 0; i < in_image.size(); ++i)
     {
@@ -44,9 +52,25 @@ int main(int argc, char **argv)
         }
     }
 
+    /////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////
+    
     /* fcn. kernel/lucy richardson */
-    // cpuLucyRichardson(width, height, num_iter, input_image_proc, output_image_proc);
+    if ( cpuLucyRichardson(width, height, 5, input_image_proc, output_image_proc) < 0)
+    {
+        return -1; // error already printed to stderr
+    }
 
+    // for (int i=0; i< 960*960*3; ++i)
+    // {
+    //     output_image_proc[i] = input_image_proc[i];
+    // }
+
+    /////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////
+    
     /* initialize output .png */
     std::vector<unsigned char> out_image;
     for (int i = 0; i < in_image.size(); ++i)
@@ -62,7 +86,8 @@ int main(int argc, char **argv)
     error = lodepng::encode(output_file, out_image, width, height);
     if (error)
     {
-        std::cout << "encoder error " << error << ": " << lodepng_error_text(error) << std::endl;
+        std::cerr << "encoder error " << error << ": " << lodepng_error_text(error) << std::endl;
+        return -1;
     }
 
     /* clean-up temporary vars for processing */
