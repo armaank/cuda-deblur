@@ -22,7 +22,8 @@ int main(int argc, char **argv)
 
     /* input image */
     std::vector<unsigned char> in_image;
-    unsigned int width, height;
+    
+    unsigned width, height;
 
     /* decode .png input, error check */
     unsigned error = lodepng::decode(in_image, width, height, input_file);
@@ -57,7 +58,7 @@ int main(int argc, char **argv)
     /////////////////////////////////////////////////////////////////////////////////
     
     /* fcn. kernel/lucy richardson */
-    if ( cpuLucyRichardson(width, height, 100, input_image_proc, output_image_proc) < 0)
+    if ( cpuLucyRichardson(width, height, 1, input_image_proc, output_image_proc) < 0)
     {
         return -1; // error already printed to stderr
     }
