@@ -40,14 +40,8 @@ int cpuLucyRichardson(const int W, const int H, const int num_iter, unsigned cha
         psf[i++] = static_cast<unsigned char>(std::round(sample)); 
     }
     
-    for (int i=0; i < img_len; )
-    {
-        float sample = normal_dist(generator);
-        if (sample < 0 || sample > MAX_PIXEL)
-            continue;
-
-        image_output[i++] = static_cast<unsigned char>(std::round(sample)); 
-    }
+    /* initial guess for original image should be the blurred image */
+    memcpy(image_output, image_input, 3*H*W*sizeof(unsigned char));
 
     for (int i=0; i < num_iter; ++i)
         CpuLucyRichIteration(image_input, psf, image_output, tmp1, tmp2, W, H);
@@ -103,36 +97,39 @@ void updateUnderlyingImg(const unsigned char *c, const unsigned char *g, unsigne
     memcpy(f, tmp2, 3*H*W*sizeof(unsigned char));
 }
 
+
 /**
  * convolve - Computes the discrete convolution C=A*B. 
  * The dimensions of A, B, and C are all assumed to be W x H.
  */
 void convolve(const unsigned char *A, const unsigned char *B, unsigned char *C, const int W, const int H)
 {
-    const int max_val = 3*H*W;
-
+    const int n_width  = 3*W;
+    const int n_pixels = H*n_width;
+    
+    int cur_val, i, j, A_start_idx, B_start_idx;
     // will not execute if start_idx<max_val
-    for (int c_idx = 0; c_idx < max_val; ++c_idx)
+    for (int c_idx = 0; c_idx < n_pixels; ++c_idx)
     {
-        int cur_val = 0;
+        cur_val = 0;
 
         // get the single c_idx term in 2D terms
-        int i = c_idx / (3*W);      // i refers to the rows (m)
-        int j = c_idx - (3*W*i);    // j refers to the cols (n)
+        i = c_idx / n_width;        // i refers to the rows (m)
+        j = c_idx - (n_width*i);    // j refers to the cols (n)
 
-        for (int m = -H; m < H; ++m)
+        for (int m = 0; m <= i; ++m)
         {
-            for (int n = -3*W+(j%3); n < 3*W; n+=3)
-            {
-                if (i-m>=0 && i-m<H && j-n>=0 && j-n<3*W)
-                    cur_val += B[c_idx] * A[ (i - m)*3*W + (j-n) ];
-            }
-        }
+            A_start_idx = m*n_width;
+            B_start_idx = (i-m)*n_width + j;
 
-        int tmp = B[c_idx];
+            for (int n = (j%3); n <= j; n+=3)
+                cur_val += A[A_start_idx + n] * B[ B_start_idx - n ];
+        }
+            
         C[c_idx] = (cur_val > 255) ? 255 : cur_val;
     }
 }
+
 
 /** 
  * elementWiseDivision - Executes an elementwise division C = A/B.
@@ -140,10 +137,10 @@ void convolve(const unsigned char *A, const unsigned char *B, unsigned char *C, 
  */
 void elementWiseDivision(const unsigned char *A, const unsigned char *B, unsigned char *C, const int W, const int H)
 {
-    const int max_val = 3*H*W;
+    const int n_pixels = 3*H*W;
 
     // will not execute if start_idx<max_val
-    for (int c_idx = 0; c_idx < max_val; ++c_idx)
+    for (int c_idx = 0; c_idx < n_pixels; ++c_idx)
     {
         if (B[c_idx] == 0)  // not sure if this is technically correct, but for now..
             C[c_idx] = MAX_PIXEL;
@@ -159,12 +156,11 @@ void elementWiseDivision(const unsigned char *A, const unsigned char *B, unsigne
  */
 void elementWiseMultiplication(const unsigned char *A, const unsigned char *B, unsigned char *C, const int W, const int H)
 {
-    const int max_val = 3*H*W;
+    const int n_pixels = 3*H*W;
 
-    // will not execute if start_idx<max_val
-    for (int c_idx = 0; c_idx < max_val; ++c_idx)
+    for (int c_idx = 0; c_idx < n_pixels; ++c_idx)
     {
         int cur_val = int(A[c_idx]) * int(B[c_idx]);
-        C[c_idx] = cur_val >  255 ? 255 : cur_val;
+        C[c_idx] = (cur_val >  255) ? 255 : cur_val;
     }
 }
