@@ -1,0 +1,16 @@
+install libpng via:
+sudo apt-get install libpng-dev
+
+install libpng++, the wrapper for cpp:
+
+download it here: 
+http://download.savannah.nongnu.org/releases/pngpp/
+unpack it:
+tar -zxf png++-0.2.x.tar.gz -C /usr/src
+make it:
+cd /usr/src/png++-0.2.x
+make 
+test it: (this might fail, but it still worked for me, so..)
+make test 
+complete install:
+make install
