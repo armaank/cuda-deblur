@@ -1,99 +1,89 @@
 #include <iostream>
-#include <cstdlib>
-#include <cstdint>
-#include <cstring>
+#include <vector>
+#include <png++/png.hpp>
+#include <chrono>
 
-#include "png_lib/lodepng.h"
-#include "cpuLucyRichardson.h"
+#include "cpuLucyRichardson.hpp"
+#include "../benchmarks/metrics.hpp"
 
-#define MAX_PIXEL 255
+
+#define NUM_ITERATIONS 5
+
+
+Image loadImage(const char *filename);
+void  saveImage(Image &image, const char *filename);
 
 
 int main(int argc, char **argv)
 {
     const char *input_file = argv[1];
     const char *output_file = argv[2];
-    int num_iter = 10;
     if (argc <= 2)
     {
         std::cerr << "error: specify input and output files" << std::endl;
         return -1;
     }
 
-    /* input image */
-    std::vector<unsigned char> in_image;
-    unsigned int width, height;
+    Matrix filter = gaussian(3, 3, 1);
 
-    /* decode .png input, error check */
-    unsigned error = lodepng::decode(in_image, width, height, input_file);
-    if (error)
-    {
-        std::cerr << "error decoding input .png" << error << ": " << lodepng_error_text(error) << std::endl;
-        return -1;
-    }
+    std::cout << "Loading image from" << input_file << std::endl;
+    Image image = loadImage(input_file);
 
-    /* convert data from rgba to rgb, init temporary arrays for processing */
-    unsigned char *input_image_proc  = new(std::nothrow) unsigned char[(in_image.size() * 3) / 4];
-    unsigned char *output_image_proc = new(std::nothrow) unsigned char[(in_image.size() * 3) / 4];
-    if (!input_image_proc || !output_image_proc)
-    {
-        std::cerr << "error allocating memory for input and output images." << std::endl;
-        return -1;
-    }
-
-    int pointer = 0;
-    for (int i = 0; i < in_image.size(); ++i)
-    {
-        if ((i + 1) % 4 != 0)
-        {
-            input_image_proc[pointer] = in_image.at(i);
-            output_image_proc[pointer] = MAX_PIXEL;
-            pointer++;
-        }
-    }
-
-    /////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////
+    std::cout << "running lucy iterations..." << std::endl;
+    auto start = std::chrono::high_resolution_clock::now();
+    Image newImage = rlDeconv(image, filter, NUM_ITERATIONS);
+    auto end = std::chrono::high_resolution_clock::now();
     
-    /* fcn. kernel/lucy richardson */
-    if ( cpuLucyRichardson(width, height, 5, input_image_proc, output_image_proc) < 0)
-    {
-        return -1; // error already printed to stderr
-    }
+    std::cout << "Execution time: " << 
+        std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() << "microseconds" << std::endl;
 
-    // for (int i=0; i< 960*960*3; ++i)
-    // {
-    //     output_image_proc[i] = input_image_proc[i];
-    // }
+    std::cout << "PSNR: " << psnr(newImage, image) << std::endl;
 
-    /////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////
-    
-    /* initialize output .png */
-
-    std::vector<unsigned char> out_image;
-    for (int i = 0; i < in_image.size(); ++i)
-    {
-        out_image.push_back(input_image_proc[i]); // changed from output_image_proc
-        if ((i + 1) % 3 == 0)
-        {
-            out_image.push_back(MAX_PIXEL);
-        }
-    }
-
-    /* encode image as .png, error check */
-    error = lodepng::encode(output_file, out_image, width, height);
-    if (error)
-    {
-        std::cerr << "encoder error " << error << ": " << lodepng_error_text(error) << std::endl;
-        return -1;
-    }
-
-    /* clean-up temporary vars for processing */
-    delete[] input_image_proc;
-    delete[] output_image_proc;
+    saveImage(newImage, output_file);
+    std::cout << "Image saved to: " << output_file << std::endl;
 
     return 0;
+}
+
+
+
+Image loadImage(const char *filename)
+{
+    png::image<png::rgb_pixel> image(filename);
+    Image imageMatrix(3, Matrix(image.get_height(), Array(image.get_width())));
+
+    int h, w;
+    for (h = 0; h < image.get_height(); h++)
+    {
+        for (w = 0; w < image.get_width(); w++)
+        {
+            imageMatrix[0][h][w] = image[h][w].red;
+            imageMatrix[1][h][w] = image[h][w].green;
+            imageMatrix[2][h][w] = image[h][w].blue;
+        }
+    }
+
+    return imageMatrix;
+}
+
+void saveImage(Image &image, const char *filename)
+{
+    assert(image.size() == 3);
+
+    int height = image[0].size();
+    int width = image[0][0].size();
+    int x, y;
+
+    png::image<png::rgb_pixel> imageFile(width, height);
+
+    for (y = 0; y < height; y++)
+    {
+        for (x = 0; x < width; x++)
+        {
+            imageFile[y][x].red = image[0][y][x];
+            imageFile[y][x].green = image[1][y][x];
+            imageFile[y][x].blue = image[2][y][x];
+        }
+    }
+    imageFile.write(filename);
 }
