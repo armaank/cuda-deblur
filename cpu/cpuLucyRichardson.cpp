@@ -1,160 +1,123 @@
 
 
-#include "cpuLucyRichardson.h"
-
+#include <cassert>
 #include <iostream>
-#include <cstdlib>
-#include <cstdint>
-#include <cstring>
-#include <random>
+#include <cmath>
+#include <algorithm>
 
-#define MAX_PIXEL 255
+#include "cpuLucyRichardson.hpp"
 
-/* function to perform lucy richardson deconvolution on the cpu only */
-int cpuLucyRichardson(const int W, const int H, const int num_iter, unsigned char *image_input, unsigned char *image_output)
+
+Matrix createMatrix(const int height, const int width)
 {
-    const unsigned img_len = 3 * W * H;
-    const unsigned kernel_size = 3 * 3 * 3;
-    unsigned char *psf = new (std::nothrow) unsigned char[kernel_size];
-    unsigned char *tmp1 = new (std::nothrow) unsigned char[img_len];
-    unsigned char *tmp2 = new (std::nothrow) unsigned char[img_len];
-    if (!psf || !tmp1 || !tmp2)
+    return Matrix(height, Array(width, 0));
+}
+
+
+Matrix gaussian(const int height, const int width, const double sigma)
+{
+    Matrix kernel = createMatrix(height, width);
+    double sum = 0.0;
+
+    for (int i = 0; i < height; i++)
     {
-        std::cerr << "Error allocating memory for the point spread function or temporary variables." << std::endl;
-        return -1;
-    }
-
-    /* initialize the psf and output image as a gaussian 
-       instead, let's try init to all ones, normalized
-    */
-    std::default_random_engine generator;
-    std::normal_distribution<float> normal_dist(127, 100);
-    for (int i = 0; i < kernel_size;)
-    {
-        float sample = normal_dist(generator);
-        if (sample < 0 || sample > MAX_PIXEL)
-            continue;
-
-        psf[i++] = 1 / 27; //static_cast<unsigned char>(std::round(sample));
-    }
-
-    /* initial guess for original image should be the blurred image */
-    memcpy(image_output, image_input, 3 * H * W * sizeof(unsigned char));
-
-    for (int i = 0; i < num_iter; ++i)
-        CpuLucyRichIteration(image_input, psf, image_output, tmp1, tmp2, W, H);
-
-    return 0;
-}
-
-/*
- *   c - The blurred image.
- *   g - The PSF.
- *   f - The underlying image we are trying to recover.
- *   H - Height of the image.
- *   W - Width of the image.
- */
-void CpuLucyRichIteration(const unsigned char *c, unsigned char *g, unsigned char *f, unsigned char *tmp1, unsigned char *tmp2, const int W, const int H)
-{
-    updatePSF(c, g, f, tmp1, tmp2, W, H);
-    updateUnderlyingImg(c, g, f, tmp1, tmp2, W, H);
-}
-
-/**
-  * updatePSF - Executes the 'blind iteration' in the Lucy-Richardson
-  * algorithm. Updates the values of psf_k.
-  */
-void updatePSF(const unsigned char *c, unsigned char *g, const unsigned char *f, unsigned char *tmp1, unsigned char *tmp2, const int W, const int H)
-{
-    convolve(g, f, tmp1, W, H);
-
-    elementWiseDivision(c, tmp1, tmp2, W, H);
-
-    convolve(tmp2, f, tmp1, W, H);
-
-    elementWiseMultiplication(tmp1, g, tmp2, W, H);
-
-    memcpy(g, tmp2, 3 * H * W * sizeof(unsigned char));
-}
-
-/**
-  * updateUnderlyingImg - Executes a Lucy-Richardson iteration to get an updated
-  * underlying image (updates the values of f).
-  */
-void updateUnderlyingImg(const unsigned char *c, const unsigned char *g, unsigned char *f, unsigned char *tmp1, unsigned char *tmp2, const int W, const int H)
-{
-    convolve(f, g, tmp1, W, H);
-
-    elementWiseDivision(c, tmp1, tmp2, W, H);
-
-    convolve(tmp2, g, tmp1, W, H);
-
-    elementWiseMultiplication(tmp1, f, tmp2, W, H);
-
-    memcpy(f, tmp2, 3 * H * W * sizeof(unsigned char));
-}
-
-/**
- * convolve - Computes the discrete convolution C=A*B. 
- * The dimensions of A, B, and C are all assumed to be W x H.
- */
-void convolve(const unsigned char *A, const unsigned char *B, unsigned char *C, const int W, const int H)
-{
-    const int n_width = 3 * W;
-    const int n_pixels = H * n_width;
-
-    int cur_val, i, j, A_start_idx, B_start_idx;
-    // will not execute if start_idx<max_val
-    for (int c_idx = 0; c_idx < n_pixels; ++c_idx)
-    {
-        cur_val = 0;
-
-        // get the single c_idx term in 2D terms
-        i = c_idx / n_width;       // i refers to the rows (m)
-        j = c_idx - (n_width * i); // j refers to the cols (n)
-
-        for (int m = 0; m <= i; ++m)
+        for (int j = 0; j < width; j++)
         {
-            A_start_idx = m * n_width;
-            B_start_idx = (i - m) * n_width + j;
-
-            for (int n = (j % 3); n <= j; n += 3)
-                cur_val += A[A_start_idx + n] * B[B_start_idx - n];
+            kernel[i][j] = exp(-(i * i + j * j) / (2 * sigma * sigma)) / (2 * M_PI * sigma * sigma);
+            sum += kernel[i][j];
         }
-
-        C[c_idx] = (cur_val > 255) ? 255 : cur_val;
     }
+
+    for (int i = 0; i < height; i++)
+        for (int j = 0; j < width; j++)
+            kernel[i][j] /= sum;
+
+    return kernel;
 }
 
-/** 
- * elementWiseDivision - Executes an elementwise division C = A/B.
- * The dimensions of A, B, and C are all assumed to be W x H.
- */
-void elementWiseDivision(const unsigned char *A, const unsigned char *B, unsigned char *C, const int W, const int H)
-{
-    const int n_pixels = 3 * H * W;
 
-    // will not execute if start_idx<max_val
-    for (int c_idx = 0; c_idx < n_pixels; ++c_idx)
-    {
-        if (B[c_idx] == 0) // not sure if this is technically correct, but for now..
-            C[c_idx] = MAX_PIXEL;
-        else
-            C[c_idx] = A[c_idx] / B[c_idx];
-    }
+Image conv(const Image &image, const Matrix &filter)
+{
+    assert(image.size() == 3 && filter.size() != 0);
+
+    int newImageHeight = image[0].size();
+    int newImageWidth  = image[0][0].size();
+
+    Image newImage(3, createMatrix(newImageHeight, newImageWidth));
+
+    for (int d = 0; d < 3; d++)
+        for (int i = 0; i < newImageHeight; i++)
+            for (int j = 0; j < newImageWidth; j++)
+            {
+                int w_max = std::min<int>(newImageWidth, filter[0].size()+j);
+                int h_max = std::min<int>(newImageHeight, filter.size()+i);
+                for (int h = i; h < h_max; h++)
+                    for (int w = j; w < w_max; w++)
+                        newImage[d][i][j] += filter[h - i][w - j] * image[d][h][w];
+            }
+
+    return newImage;
 }
 
-/** 
- * elementWiseMultiplication - Executes an elementwise multiplication C = A*B.
- * The dimensions of A, B, and C are all assumed to be W x H.
- */
-void elementWiseMultiplication(const unsigned char *A, const unsigned char *B, unsigned char *C, const int W, const int H)
+Matrix multiply(const Matrix &a, const Matrix &b)
 {
-    const int n_pixels = 3 * H * W;
+    /* make sure that height and width match */
+    assert(a.size() == b.size() && a[0].size() == b[0].size());
 
-    for (int c_idx = 0; c_idx < n_pixels; ++c_idx)
+    Matrix result = createMatrix(a.size(), a[0].size());
+    for (int i = 0; i < result.size(); i++)
+        for (int j = 0; j < result[0].size(); j++)
+            result[i][j] = a[i][j] * b[i][j];
+
+    return result;
+}
+
+Matrix divide(const Matrix &a, const Matrix &b)
+{
+    /* make sure that height and width match */
+    assert(a.size() == b.size() && a[0].size() == b[0].size());
+
+    Matrix result = createMatrix(a.size(), a[0].size());
+    for (int i = 0; i < result.size(); i++)
+        for (int j = 0; j < result[0].size(); j++)
+        {
+            result[i][j] = b[i][j]==0 ? 999999999 : a[i][j] / b[i][j];
+        }
+            
+    return result;
+}
+
+Image rlDeconv(const Image &image,const Matrix &filter, const int n_iter)
+{
+    Image im_deconv = image;
+    Image rel_blur  = image;
+    
+    int filt_length = filter.size();
+    int filt_width = filter[0].size();
+
+    /* compute and store mirrored psf */
+    Matrix filter_m(filt_length, Array(filt_width));
+    for (int i = 0; i < filt_length; i++)
+        for (int j = 0; j < filt_width; j++)
+            filter_m[i][j] = filter[j][i];
+
+    /* perform lucy iterations */
+    std::cout << "Iteration number: " << std::flush;
+    for (int i = 0; i < n_iter; i++)
     {
-        int cur_val = int(A[c_idx]) * int(B[c_idx]);
-        C[c_idx] = (cur_val > 255) ? 255 : cur_val;
+        std::cout << i+1 << ", " << std::flush;
+
+        Image tmp1 = conv(im_deconv, filter);   /* convolve target image by psf */
+
+        for (int d = 0; d < 3; d++)             /* element-wise division to compute relative blur */
+            rel_blur[d] = divide(image[d], tmp1[d]);
+
+        Image tmp2 = conv(rel_blur, filter_m);  /* filter blur by psf */
+
+        for (int d = 0; d < 3; d++)             /* element-wise multiply to update deblurred image */
+            im_deconv[d] = multiply(tmp2[d], im_deconv[d]);
     }
+    std::cout << "\n";
+
+    return im_deconv;
 }
