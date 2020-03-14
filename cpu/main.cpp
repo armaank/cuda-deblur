@@ -10,44 +10,58 @@
 #define NUM_ITERATIONS 5
 
 
-Image loadImage(const char *filename);
-void  saveImage(Image &image, const char *filename);
+Image loadImage(const std::string &filename);
+void  saveImage(Image &image, const std::string &filename);
+void runLucyRichardson(const Matrix &kernel, const Image &blurry_image, const std::string &output_file);
 
 
 int main(int argc, char **argv)
 {
-    const char *input_file = argv[1];
-    const char *output_file = argv[2];
+    std::string input_file = argv[1];
+    std::string output_file = argv[2];
     if (argc <= 2)
     {
         std::cerr << "error: specify input and output files" << std::endl;
         return -1;
     }
-
-    Matrix filter = gaussian(3, 3, 1);
-
     std::cout << "Loading image from" << input_file << std::endl;
     Image image = loadImage(input_file);
 
-    std::cout << "running lucy iterations..." << std::endl;
-    auto start = std::chrono::high_resolution_clock::now();
-    Image newImage = rlDeconv(image, filter, NUM_ITERATIONS);
-    auto end = std::chrono::high_resolution_clock::now();
+    /////////////////////////////////////////////////////////////////////////
+
+    // Kernel: gaussian 3x3
+    Matrix filter = gaussian(3, 3, 1);
+    runLucyRichardson(filter, image, output_file+"_gaussKernel3"+ ".png");
+
+    // Kernel: gaussian 7x7
+    filter = gaussian(7, 7, 1);
+    runLucyRichardson(filter, image, output_file+"_gaussKernel7"+ ".png");
+
+    /////////////////////////////////////////////////////////////////////////
     
-    std::cout << "Execution time: " << 
-        std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() << "microseconds" << std::endl;
-
-    std::cout << "PSNR: " << psnr(newImage, image) << std::endl;
-
-    saveImage(newImage, output_file);
-    std::cout << "Image saved to: " << output_file << std::endl;
 
     return 0;
 }
 
 
+void runLucyRichardson(const Matrix &kernel, const Image &blurry_image, const std::string &output_file)
+{
+    std::cout << "running lucy iterations..." << std::endl;
+    auto start = std::chrono::high_resolution_clock::now();
+    Image newImage = rlDeconv(blurry_image, kernel, NUM_ITERATIONS);
+    auto end = std::chrono::high_resolution_clock::now();
+    
+    std::cout << "Execution time: " << 
+        std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() << "microseconds" << std::endl;
 
-Image loadImage(const char *filename)
+    std::cout << "PSNR: " << psnr(newImage, blurry_image) << std::endl;
+
+    saveImage(newImage, output_file);
+    std::cout << "Image saved to: " << output_file << std::endl;
+}
+
+
+Image loadImage(const std::string &filename)
 {
     png::image<png::rgb_pixel> image(filename);
     Image imageMatrix(3, Matrix(image.get_height(), Array(image.get_width())));
@@ -66,7 +80,7 @@ Image loadImage(const char *filename)
     return imageMatrix;
 }
 
-void saveImage(Image &image, const char *filename)
+void saveImage(Image &image, const std::string &filename)
 {
     assert(image.size() == 3);
 
