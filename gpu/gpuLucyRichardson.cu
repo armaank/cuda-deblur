@@ -109,6 +109,9 @@ void kernel_convolve(const float *A, const float *B, float *C, const uint W, con
         }
     }
 }
+/* convolve a 2D image (RBG) w/ a filter */
+__global__
+
 
 
 /** 

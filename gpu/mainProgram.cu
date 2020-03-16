@@ -3,7 +3,7 @@
 #include <vector>
 #include <iostream>
 
-#include "lucyRichardson.cu"
+#include "gpuLucyRichardson.cu"
 #include "../benchmarks/metrics.cpp" 
 #include "../benchmarks/gputime.h"
 
@@ -18,8 +18,11 @@ using Image  = std::vector<Matrix>;
 
 Image loadImage(const std::string &filename);
 void  saveImage(Image &image, const std::string &filename);
-void runLucyRichardson(const Matrix &kernel, const Image &blurry_image, const std::string &output_file);
+void runLucyRichardson(const Matrix &kernel, const Image &blurry_image, const Image &target_image const std::string &output_file);
+void runSimpleFilter(const Matrix &kernel, const Image &blurry_image, const Image &target_image const std::string &output_file);
+
 Matrix gaussian(const int height, const int width, const double sigma);
+Matrix sharpen(const int height, const int width);
 
 double *image2ptr(const Image &input);
 double *matrix2ptr(const Matrix &input);
@@ -28,19 +31,20 @@ Image ptr2image(const double *input, const int width, const int height);
 
 int main(void)
 {
-    std::string input_file = argv[1];
-    std::string output_file = argv[2];
-    if (argc <= 2)
+    std::string input_file = argv[1];  // blurry image
+    std::string output_file = argv[2]; // deblurred image
+    std::string target_file = argv[3]; // target image 'ground truth';
+
+    if (argc <= 3)
     {
         std::cerr << "error: specify input and output files" << std::endl;
         return -1;
     }
     std::cout << "Loading image from" << input_file << std::endl;
     Image image = loadImage(input_file);
+    Image target_image = loadImage(target_file);
 
-    int width = image[0][0].size;
-    int height = image[0].size;
-    int size = 3*width*height;
+    /////////////////////////////////////////////////////////////////////////
 
     /* initalize gpu timers */
     GpuTimer gputime_lucy;
@@ -54,12 +58,31 @@ int main(void)
     filter = gaussian(7, 7, 1);
     runLucyRichardson(filter, image, output_file+"_gaussKernel7"+ ".png");
 
+    filter = sharpen(3,3)
+    runSimpleFilter(filter, image, output+file+"_sharpen3"+".png")
+
     std::cout << "Done!" << std::endl;
+    
+    /////////////////////////////////////////////////////////////////////////
+
+
     return 0;
 }
 
+void runSimpleFilter(const Matrix &filter, const Image &blurry_image, const Image &target_image const std::string &output_file)
+{
+    std::cout << "running simple filter..." << std::endl;
 
-void runLucyRichardson(const Matrix &filter, const Image &blurry_image, const std::string &output_file)
+    cudaError_t err = cudaSuccess; // Error code to check return values for CUDA calls
+
+    // allocate device arrays
+    // convolve filter and image
+    // de-allocate device arrays
+    // compute psnr
+    // end
+
+}
+void runLucyRichardson(const Matrix &filter, const Image &blurry_image, const Image &target_image const std::string &output_file)
 {
     std::cout << "running lucy iterations..." << std::endl;
 
@@ -224,7 +247,7 @@ void runLucyRichardson(const Matrix &filter, const Image &blurry_image, const st
     std::cout << "Total time Elapsed - GPU: " << gputime_gpu.elapsed_time << " ms" << std::endl;
     std::cout << "Lucy Iteration time Elapsed - GPU: " << gputime_lucy.elapsed_time << " ms" << std::endl; 
 
-    std::cout << "PSNR: " << psnr(output, blurry_image) << std::endl;
+    std::cout << "PSNR: " << psnr(output, target_image) << std::endl;
 
     saveImage(output, output_file);
     std::cout << "Image saved to: " << output_file << std::endl;
@@ -344,6 +367,23 @@ Matrix gaussian(const int height, const int width, const double sigma)
     for (int i = 0; i < height; i++)
         for (int j = 0; j < width; j++)
             kernel[i][j] /= sum;
+
+    return kernel;
+}
+
+Matrix sharpen(const int height, const int width)
+{
+    Matrix kernel = createMatrix(height, width);
+
+    kernel[0][0] = 0;
+    kernel[1][0] = -1;
+    kernel[2][0] = 0;
+    kernel[1][0] = -1;
+    kernel[1][1] = 4;
+    kernel[1][2] = -1;
+    kernel[2][0] = 0;
+    kernel[2][1] = -1;
+    kernel[2][2] = 0;
 
     return kernel;
 }
