@@ -1,0 +1,16 @@
+Loading image from../data/nasa_earth_blurry.png
+running lucy iterations...
+Iteration number: 1, 2, 3, 4, 5, 
+Execution time: 6590772microseconds
+PSNR: 26.5147
+Image saved to: ./output/deblur_gaussKernel3.png
+running lucy iterations...
+Iteration number: 1, 2, 3, 4, 5, 
+Execution time: 32537250microseconds
+PSNR: 26.5187
+Image saved to: ./output/deblur_gaussKernel7.png
+running simple filter...
+Execution time: 648447microseconds
+PSNR: 30.6709
+Image saved to: ./output/deblur_sharpen3.png
+Blurry Image PSNR:30.6701

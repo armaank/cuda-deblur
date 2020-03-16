@@ -7,12 +7,10 @@
 
 #include "cpuLucyRichardson.hpp"
 
-
 Matrix createMatrix(const int height, const int width)
 {
     return Matrix(height, Array(width, 0));
 }
-
 
 Matrix gaussian(const int height, const int width, const double sigma)
 {
@@ -35,13 +33,29 @@ Matrix gaussian(const int height, const int width, const double sigma)
     return kernel;
 }
 
+Matrix sharpen(const int height, const int width)
+{
+    Matrix kernel = createMatrix(height, width);
+
+    kernel[0][0] = 0;
+    kernel[1][0] = -1;
+    kernel[2][0] = 0;
+    kernel[1][0] = -1;
+    kernel[1][1] = 4;
+    kernel[1][2] = -1;
+    kernel[2][0] = 0;
+    kernel[2][1] = -1;
+    kernel[2][2] = 0;
+
+    return kernel;
+}
 
 Image conv(const Image &image, const Matrix &filter)
 {
     assert(image.size() == 3 && filter.size() != 0);
 
     int newImageHeight = image[0].size();
-    int newImageWidth  = image[0][0].size();
+    int newImageWidth = image[0][0].size();
 
     Image newImage(3, createMatrix(newImageHeight, newImageWidth));
 
@@ -49,8 +63,8 @@ Image conv(const Image &image, const Matrix &filter)
         for (int i = 0; i < newImageHeight; i++)
             for (int j = 0; j < newImageWidth; j++)
             {
-                int w_max = std::min<int>(newImageWidth, filter[0].size()+j);
-                int h_max = std::min<int>(newImageHeight, filter.size()+i);
+                int w_max = std::min<int>(newImageWidth, filter[0].size() + j);
+                int h_max = std::min<int>(newImageHeight, filter.size() + i);
                 for (int h = i; h < h_max; h++)
                     for (int w = j; w < w_max; w++)
                         newImage[d][i][j] += filter[h - i][w - j] * image[d][h][w];
@@ -81,17 +95,17 @@ Matrix divide(const Matrix &a, const Matrix &b)
     for (int i = 0; i < result.size(); i++)
         for (int j = 0; j < result[0].size(); j++)
         {
-            result[i][j] = b[i][j]==0 ? 999999999 : a[i][j] / b[i][j];
+            result[i][j] = b[i][j] == 0 ? 999999999 : a[i][j] / b[i][j];
         }
-            
+
     return result;
 }
 
-Image rlDeconv(const Image &image,const Matrix &filter, const int n_iter)
+Image rlDeconv(const Image &image, const Matrix &filter, const int n_iter)
 {
     Image im_deconv = image;
-    Image rel_blur  = image;
-    
+    Image rel_blur = image;
+
     int filt_length = filter.size();
     int filt_width = filter[0].size();
 
@@ -105,16 +119,16 @@ Image rlDeconv(const Image &image,const Matrix &filter, const int n_iter)
     std::cout << "Iteration number: " << std::flush;
     for (int i = 0; i < n_iter; i++)
     {
-        std::cout << i+1 << ", " << std::flush;
+        std::cout << i + 1 << ", " << std::flush;
 
-        Image tmp1 = conv(im_deconv, filter);   /* convolve target image by psf */
+        Image tmp1 = conv(im_deconv, filter); /* convolve target image by psf */
 
-        for (int d = 0; d < 3; d++)             /* element-wise division to compute relative blur */
+        for (int d = 0; d < 3; d++) /* element-wise division to compute relative blur */
             rel_blur[d] = divide(image[d], tmp1[d]);
 
-        Image tmp2 = conv(rel_blur, filter_m);  /* filter blur by psf */
+        Image tmp2 = conv(rel_blur, filter_m); /* filter blur by psf */
 
-        for (int d = 0; d < 3; d++)             /* element-wise multiply to update deblurred image */
+        for (int d = 0; d < 3; d++) /* element-wise multiply to update deblurred image */
             im_deconv[d] = multiply(tmp2[d], im_deconv[d]);
     }
     std::cout << "\n";
