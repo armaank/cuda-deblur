@@ -1,18 +1,20 @@
 /* Benchmarking algorithm performance via GPU time */
 
 /* based off example here: https://devblogs.nvidia.com/how-implement-performance-metrics-cuda-cc */
+#pragma once 
 
-struct gpuTimer
+
+struct GpuTimer
 {
 	cudaEvent_t start, stop;
 
-	gpuTimer()
+	GpuTimer()
 	{
 		cudaEventCreate(&start);
 		cudaEventCreate(&stop);
 	}
 
-	~gpuTimer()
+	~GpuTimer()
 	{
 		cudaEventDestroy(start);
 		cudaEventDestroy(stop);

@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <iostream>
+#include <png++/png.hpp>
 
 #include "gpuLucyRichardson.cu"
 #include "../benchmarks/metrics.cpp" 
@@ -18,8 +19,8 @@ using Image  = std::vector<Matrix>;
 
 Image loadImage(const std::string &filename);
 void  saveImage(Image &image, const std::string &filename);
-void runLucyRichardson(const Matrix &kernel, const Image &blurry_image, const Image &target_image const std::string &output_file);
-void runSimpleFilter(const Matrix &kernel, const Image &blurry_image, const Image &target_image const std::string &output_file);
+void runLucyRichardson(const Matrix &kernel, const Image &blurry_image, const Image &target_image, const std::string &output_file);
+void runSimpleFilter(const Matrix &kernel, const Image &blurry_image, const Image &target_image, const std::string &output_file);
 
 Matrix gaussian(const int height, const int width, const double sigma);
 Matrix sharpen(const int height, const int width);
@@ -29,7 +30,7 @@ double *matrix2ptr(const Matrix &input);
 Image ptr2image(const double *input, const int width, const int height);
 
 
-int main(void)
+int main(int argc, char **argv)
 {
     std::string input_file = argv[1];  // blurry image
     std::string output_file = argv[2]; // deblurred image
@@ -46,20 +47,16 @@ int main(void)
 
     /////////////////////////////////////////////////////////////////////////
 
-    /* initalize gpu timers */
-    GpuTimer gputime_lucy;
-    GpuTimer gputime_gpu;
-
     // Kernel: gaussian 3x3
     Matrix filter = gaussian(3, 3, 1);
-    runLucyRichardson(filter, image, output_file+"_gaussKernel3"+ ".png");
+    runLucyRichardson(filter, image, target_image, output_file+"_gaussKernel3"+ ".png");
 
     // Kernel: gaussian 7x7
     filter = gaussian(7, 7, 1);
-    runLucyRichardson(filter, image, output_file+"_gaussKernel7"+ ".png");
+    runLucyRichardson(filter, image, target_image, output_file+"_gaussKernel7"+ ".png");
 
-    filter = sharpen(3,3)
-    runSimpleFilter(filter, image, output+file+"_sharpen3"+".png")
+    filter = sharpen(3,3);
+    runSimpleFilter(filter, image, target_image, output_file+"_sharpen3"+".png");
 
     std::cout << "Done!" << std::endl;
     
@@ -69,7 +66,7 @@ int main(void)
     return 0;
 }
 
-void runSimpleFilter(const Matrix &filter, const Image &blurry_image, const Image &target_image const std::string &output_file)
+void runSimpleFilter(const Matrix &filter, const Image &blurry_image, const Image &target_image, const std::string &output_file)
 {
     std::cout << "running simple filter..." << std::endl;
 
@@ -82,15 +79,24 @@ void runSimpleFilter(const Matrix &filter, const Image &blurry_image, const Imag
     // end
 
 }
-void runLucyRichardson(const Matrix &filter, const Image &blurry_image, const Image &target_image const std::string &output_file)
+
+
+void runLucyRichardson(const Matrix &filter, const Image &blurry_image, const Image &target_image, const std::string &output_file)
 {
     std::cout << "running lucy iterations..." << std::endl;
+    
+    /* initalize gpu timers */
+    GpuTimer gputime_lucy;
+    GpuTimer gputime_gpu;
+    
+    int size = 3*blurry_image[0].size*blurry_image[0][0].size;
+    double *image_ptr  = image2ptr(blurry_image);
+    double *output_ptr = new (std::nothrow) double(size);
 
-    double *image_ptr  = image2ptr(image);
-
-    Matrix filter_m(filt_length, Array(filt_width));
-    for (int i = 0; i < filt_length; i++)
-        for (int j = 0; j < filt_width; j++)
+    int filter_size = filter.size*filter[0].size;
+    Matrix filter_m(filter.size, Array(filter[0].size));
+    for (int i = 0; i < filter.size; i++)
+        for (int j = 0; j < filter[0].size; j++)
             filter_m[i][j] = filter[j][i];
 
     double *filter_ptr = matrix2ptr(filter);    
@@ -189,16 +195,16 @@ void runLucyRichardson(const Matrix &filter, const Image &blurry_image, const Im
     one that times the entire process for cpu and gpu, that way we know what the overhead is and factor 
     that into our analysis -armaan
     */
-    gputime_lucy.start()
+    gputime_lucy.start();
     for (int i=0; i<NUM_ITERATIONS; ++i)
     {
-        updateUnderlyingImg(d_c, d_g, d_g_m, d_f, d_tmp1, d_tmp2, W, H);
+        updateUnderlyingImg(d_c, d_g, d_g_m, d_f, d_tmp1, d_tmp2, blurry_image[0][0].size, blurry_image[0].size);
     }
-    gputime_lucy.stop()
+    gputime_lucy.stop();
 
     // Copy the device result vector in device memory to the host result vector in host memory.
     printf("Copy output data from the CUDA device to the host memory\n");
-    err = cudaMemcpy(h_f, d_f, size, cudaMemcpyDeviceToHost);
+    err = cudaMemcpy(output_ptr, d_f, size, cudaMemcpyDeviceToHost);
     if (err != cudaSuccess)
     {
         fprintf(stderr, "Failed to copy vector f from device to host (error code %s)!\n", cudaGetErrorString(err));
@@ -234,15 +240,15 @@ void runLucyRichardson(const Matrix &filter, const Image &blurry_image, const Im
         exit(EXIT_FAILURE);
     }
 
-    err = cudaFree(d_tmp2;
+    err = cudaFree(d_tmp2);
     if (err != cudaSuccess)
     {
         fprintf(stderr, "Failed to free device vector tmp2 (error code %s)!\n", cudaGetErrorString(err));
         exit(EXIT_FAILURE);
     }
-    gputime_gpu.stop()    
+    gputime_gpu.stop();
 
-    Image output = ptr2image(h_f, blurry_image[0][0].size, blurry_image[0].size);
+    Image output = ptr2image(output_ptr, blurry_image[0][0].size, blurry_image[0].size);
 
     std::cout << "Total time Elapsed - GPU: " << gputime_gpu.elapsed_time << " ms" << std::endl;
     std::cout << "Lucy Iteration time Elapsed - GPU: " << gputime_lucy.elapsed_time << " ms" << std::endl; 
@@ -256,20 +262,19 @@ void runLucyRichardson(const Matrix &filter, const Image &blurry_image, const Im
 
 Image loadImage(const std::string &filename)
 {
-    png::image<png::rgb_pixel> image(filename);
-    Image imageMatrix(3, Matrix(image.get_height(), Array(image.get_width())));
+    png::image<png::rgb_pixel> in_image(filename);
+    Image imageMatrix(3, Matrix(in_image.get_height(), Array(in_image.get_width())));
 
     int h, w;
-    for (h = 0; h < image.get_height(); h++)
+    for (h = 0; h < in_image.get_height(); h++)
     {
-        for (w = 0; w < image.get_width(); w++)
+        for (w = 0; w < in_image.get_width(); w++)
         {
-            imageMatrix[0][h][w] = image[h][w].red;
-            imageMatrix[1][h][w] = image[h][w].green;
-            imageMatrix[2][h][w] = image[h][w].blue;
+            imageMatrix[0][h][w] = in_image[h][w].red;
+            imageMatrix[1][h][w] = in_image[h][w].green;
+            imageMatrix[2][h][w] = in_image[h][w].blue;
         }
     }
-
     return imageMatrix;
 }
 
@@ -334,7 +339,7 @@ double *matrix2ptr(const Matrix &input)
 
 Image ptr2image(const double *input, const int width, const int height)
 {
-    Image output(3, Matrix(height, width));
+    Image output(3, Matrix(height, std::vector<double>(width, 0)));
 
     int idx = 0;
     for (int i = 0; i < height; ++i)

@@ -289,7 +289,7 @@ CFLAGS += $(COMMONFLAGS)
 LIB_CUDA := -L$(CUDA_PATH)/lib -lcudart
 PNG_LIB = `libpng-config --ldflags`
 
-OBJS = mainProgram.cu.o gpuLucyRichardson.cu.o benchmarks.o
+OBJS = benchmarks.o mainProgram.cu.o gpuLucyRichardson.cu.o 
 TARGET = exec
 LINKLINE = $(LINK) -o $(TARGET) $(OBJS) $(LIB_CUDA)
 
