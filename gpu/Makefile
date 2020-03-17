@@ -273,10 +273,9 @@ endif
 ################################################################################
 
 # Target rules
-XX := g++
-CC := gcc
+CXX := g++
+CC:=gcc
 LINK := g++ -fPIC
-NVCC  := nvcc
 
 # Includes
 INCLUDES = -I. -I$(CUDA_PATH)/include
@@ -296,19 +295,27 @@ LINKLINE = $(LINK) -o $(TARGET) $(OBJS) $(LIB_CUDA)
 
 .SUFFIXES: .c .cpp .cu .o
 
+all: gpuLucyRich
+
+gpuLucyRich: $(OBJS) Makefile
+	$(LINKLINE) -o $@
+	
 %.c.o: %.c
-        $(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 %.cu.o: %.cu
-        $(NVCC) $(NVCCFLAGS) -c $< -o $@
+	$(NVCC) $(NVCCFLAGS) -c $< -o $@
 
 %.cpp.o: %.cpp
-        $(CXX) $(CXXFLAGS) -c $< -o $@$ $(PNG_LIB)
+	$(CXX) $(CXXFLAGS) -c $< -o $@$ $(PNG_LIB)
 
 benchmarks.o: ../benchmarks/metrics.cpp ../benchmarks/metrics.hpp
-	$(CC) $(CXXFLAGS) -c ../benchmarks/metrics.cpp
+	$(CXX) $(CXXFLAGS) -c ../benchmarks/metrics.cpp
 
-$(TARGET): $(OBJS) Makefile
-        $(LINKLINE)
+clean:
+	rm *.o 
+	rm gpuLucyRich
+
+
 
 
