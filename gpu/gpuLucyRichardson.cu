@@ -1,11 +1,13 @@
    
+#include <iostream>
+
 
 /////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////// Kernel Functions ////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////
 
 __global__
-void kernel_internalMemcpy(float *dest,const float *from, const uint W, const uint H)
+void kernel_internalMemcpy(double *dest, const double *from, const uint W, const uint H)
 {
     const int start_idx = blockDim.x * blockIdx.x + threadIdx.x;
     const int stride    = blockDim.x * gridDim.x;
@@ -21,11 +23,11 @@ void kernel_internalMemcpy(float *dest,const float *from, const uint W, const ui
  * The dimensions of A, B, and C are all assumed to be W x H.
  */
 __global__
-void kernel_convolve(const float *A, const float *B, float *C, const uint W, const uint H)
+void kernel_convolve(const double *A, const double *B, double *C, const uint W, const uint H)
 {
     const int start_idx = blockDim.x * blockIdx.x + threadIdx.x;
     const int stride    = blockDim.x * gridDim.x;
-    const int max_val   = H*W;
+    const int max_val   = 3*H*W;
 
     // will not execute if start_idx<max_val
     for (int c_idx=start_idx; c_idx<max_val; c_idx += stride) 
@@ -33,22 +35,14 @@ void kernel_convolve(const float *A, const float *B, float *C, const uint W, con
         C[c_idx] = 0;
 
         // get the single c_idx term in 2D terms
-        int i = c_idx % W;
-        int j = c_idx - W*i;
+        int i = c_idx % (3*W);
+        int j = c_idx / W;
 
         for (int m=0; m<H; ++m)
-        {
-            for (int n=0; j<W; ++n)
-            {
-                int cur_idx = m*W + n;
-                C[c_idx] += A[cur_idx] * B[ (i-m)*W+(j-n) ];
-            }
-        }
+            for (int n=j%3; j<3*W; n+=3)
+                C[c_idx] += A[m*3*W + n] * B[ (i-m)*3*W+(j-n) ];
     }
 }
-/* convolve a 2D image (RBG) w/ a filter */
-__global__
-
 
 
 /** 
@@ -56,7 +50,7 @@ __global__
  * The dimensions of A, B, and C are all assumed to be W x H.
  */
 __global__
-void kernel_elementWiseDivision(const float *A, const float *B, float *C, const uint W, const uint H)
+void kernel_elementWiseDivision(const double *A, const double *B, double *C, const uint W, const uint H)
 {
     const int start_idx = blockDim.x * blockIdx.x + threadIdx.x;
     const int stride    = blockDim.x * gridDim.x;
@@ -74,7 +68,7 @@ void kernel_elementWiseDivision(const float *A, const float *B, float *C, const 
  * The dimensions of A, B, and C are all assumed to be W x H.
  */
 __global__
-void kernel_elementWiseMultiplication(const float *A, const float *B, float *C, const uint W, const uint H)
+void kernel_elementWiseMultiplication(const double *A, const double *B, double *C, const uint W, const uint H)
 {
     const int start_idx = blockDim.x * blockIdx.x + threadIdx.x;
     const int stride    = blockDim.x * gridDim.x;
@@ -101,7 +95,7 @@ void kernel_elementWiseMultiplication(const float *A, const float *B, float *C, 
   *   H - Height of the image.
   *   W - Width of the image.
   */
-  void updateUnderlyingImg(const float *c, const float *g, const float *g_m, float *f, float *tmp1, float *tmp2, const uint W, const uint H)
+  void updateUnderlyingImg(const double *c, const double *g, const double *g_m, double *f, double *tmp1, double *tmp2, const uint W, const uint H)
   {
       cudaError_t err = cudaSuccess; // Error code to check return values for CUDA calls
 
@@ -112,7 +106,7 @@ void kernel_elementWiseMultiplication(const float *A, const float *B, float *C, 
       err = cudaGetLastError();
       if (err != cudaSuccess)
       {
-          fprintf(stderr, "Failed to launch KernelConvolve kernel (error code %s)!\n", cudaGetErrorString(err));
+          std::cerr << "Failed to launch KernelConvolve kernel (error code " << cudaGetErrorString(err) << ")!\n";
           exit(EXIT_FAILURE);
       }
   
@@ -120,7 +114,7 @@ void kernel_elementWiseMultiplication(const float *A, const float *B, float *C, 
       err = cudaGetLastError();
       if (err != cudaSuccess)
       {
-          fprintf(stderr, "Failed to launch KernelElementWiseDivision kernel (error code %s)!\n", cudaGetErrorString(err));
+          std::cerr << "Failed to launch KernelElementWiseDivision kernel (error code " << cudaGetErrorString(err) << ")!\n";
           exit(EXIT_FAILURE);
       }
   
@@ -128,7 +122,7 @@ void kernel_elementWiseMultiplication(const float *A, const float *B, float *C, 
       err = cudaGetLastError();
       if (err != cudaSuccess)
       {
-          fprintf(stderr, "Failed to launch KernelConvolve kernel (error code %s)!\n", cudaGetErrorString(err));
+          std::cerr << "Failed to launch KernelConvolve kernel (error code " << cudaGetErrorString(err) << ")!\n";
           exit(EXIT_FAILURE);
       }
   
@@ -147,4 +141,5 @@ void kernel_elementWiseMultiplication(const float *A, const float *B, float *C, 
           fprintf(stderr, "Failed to launch KernelInternalMemcpy kernel (error code %s)!\n", cudaGetErrorString(err));
           exit(EXIT_FAILURE);
       }
+
   }
