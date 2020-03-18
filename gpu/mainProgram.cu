@@ -6,7 +6,7 @@
 
 #include "gpuLucyRichardson.cu"
 #include "../benchmarks/metrics.cpp" 
-#include "../benchmarks/gputime.h"
+//#include "../benchmarks/gputime.h"
 
 #define NUM_ITERATIONS 5
 
@@ -85,10 +85,13 @@ void runLucyRichardson(const Matrix &filter, const Image &blurry_image, const Im
 {
     std::cout << "running lucy iterations..." << std::endl;
     
-    /* initalize gpu timers */
-    GpuTimer gputime_lucy;
-    GpuTimer gputime_gpu;
-    
+    /* initalize gpu timers - no longer using the class I wrote. For now, I'll just write one timer for the whole thing, and once we get the rest of the code up and running, I can add more if need be */
+    cudaEvent_t start, stop;
+    cudaEventCreate(&start);
+    cudaEventCreate(&stop);
+    float elaps_t = 0;    
+    cudaEventRecord(start, 0); 
+   
     int size = 3*blurry_image[0].size*blurry_image[0][0].size;
     double *image_ptr  = image2ptr(blurry_image);
     double *output_ptr = new (std::nothrow) double(size);
@@ -104,7 +107,6 @@ void runLucyRichardson(const Matrix &filter, const Image &blurry_image, const Im
             
     cudaError_t err = cudaSuccess;  // Error code to check return values for CUDA calls
 
-    gputime_gpu.start();
 
     // Allocate the device input vector f
     float *d_f = NULL;
@@ -195,12 +197,10 @@ void runLucyRichardson(const Matrix &filter, const Image &blurry_image, const Im
     one that times the entire process for cpu and gpu, that way we know what the overhead is and factor 
     that into our analysis -armaan
     */
-    gputime_lucy.start();
     for (int i=0; i<NUM_ITERATIONS; ++i)
     {
         updateUnderlyingImg(d_c, d_g, d_g_m, d_f, d_tmp1, d_tmp2, blurry_image[0][0].size, blurry_image[0].size);
     }
-    gputime_lucy.stop();
 
     // Copy the device result vector in device memory to the host result vector in host memory.
     printf("Copy output data from the CUDA device to the host memory\n");
@@ -246,12 +246,14 @@ void runLucyRichardson(const Matrix &filter, const Image &blurry_image, const Im
         fprintf(stderr, "Failed to free device vector tmp2 (error code %s)!\n", cudaGetErrorString(err));
         exit(EXIT_FAILURE);
     }
-    gputime_gpu.stop();
 
     Image output = ptr2image(output_ptr, blurry_image[0][0].size, blurry_image[0].size);
-
-    std::cout << "Total time Elapsed - GPU: " << gputime_gpu.elapsed_time << " ms" << std::endl;
-    std::cout << "Lucy Iteration time Elapsed - GPU: " << gputime_lucy.elapsed_time << " ms" << std::endl; 
+    /* end timer */
+    cudaEventRecord(stop, 0);
+    cudaEventSynchronize(stop);
+    cudaEventElapsedTime(&elaps_t, start, stop);
+    std::cout << "Total time Elapsed - GPU: " << elaps_t << " ms" << std::endl;
+    //std::cout << "Lucy Iteration time Elapsed - GPU: " << gputime_lucy.elapsed_time << " ms" << std::endl; 
 
     std::cout << "PSNR: " << psnr(output, target_image) << std::endl;
 
