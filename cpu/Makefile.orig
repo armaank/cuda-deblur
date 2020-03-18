@@ -2,11 +2,19 @@ CC = g++ # compiler
 CXXFLAGS = -std=c++11 # flags
 PNG_LIB = `libpng-config --ldflags`
 
+<<<<<<< HEAD
+make: main.cpp cpuLucyRichardson.o benchmarks.o
+	$(CC) $(CXXFLAGS) main.cpp cpuLucyRichardson.o metrics.o $(PNG_LIB) -o deblur.out
+
+debug: main.cpp cpuLucyRichardson.o benchmarks.o
+	$(CC) $(CXXFLAGS) -g main.cpp cpuLucyRichardson.o metrics.o $(PNG_LIB)
+=======
 make: main.cpp cpuDeblur.o benchmarks.o ops.o
 	$(CC) $(CXXFLAGS) main.cpp cpuDeblur.cpp ops.cpp ../benchmarks/metrics.cpp $(PNG_LIB) -o deblur.out
 
 debug: main.cpp cpuDeblur.o benchmarks.o ops.o
 	$(CC) $(CXXFLAGS) -g main.cpp cpuDeblur.cpp ops.cpp ../benchmarks/metrics.cpp $(PNG_LIB)
+>>>>>>> cpu_algo
 
 cpuDeblur.o: cpuDeblur.cpp cpuDeblur.hpp ops.o
 	$(CC) $(CXXFLAGS) -g -c cpuDeblur.cpp ops.cpp 

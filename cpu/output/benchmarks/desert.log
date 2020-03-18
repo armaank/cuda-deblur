@@ -1,0 +1,10 @@
+Loading image from ../data/desert_blurry.png
+Iteration number: 1, 
+Execution time: 1919273 microseconds
+PSNR: 25.0262
+Image saved to: ./output/benchmarks/desert_deblur_gaussKernel3.png
+Iteration number: 1, 
+Execution time: 7293231 microseconds
+PSNR: 25.0252
+Image saved to: ./output/benchmarks/desert_deblur_gaussKernel7.png
+Blurry Image PSNR: 26.3625
