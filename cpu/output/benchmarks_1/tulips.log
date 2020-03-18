@@ -1,0 +1,16 @@
+Loading image from ../data/tulips_blurry.png
+running lucy iterations...
+Iteration number: 1, 
+Execution time: 3459907microseconds
+PSNR: 30.0654
+Image saved to: ./output/benchmarks/tulips_deblur_gaussKernel3.png
+running lucy iterations...
+Iteration number: 1, 
+Execution time: 15846278microseconds
+PSNR: 30.0915
+Image saved to: ./output/benchmarks/tulips_deblur_gaussKernel7.png
+running simple filter...
+Execution time: 1543474microseconds
+PSNR: 30.7145
+Image saved to: ./output/benchmarks/tulips_deblur_sharpen3.png
+Blurry Image PSNR: 30.7373

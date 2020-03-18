@@ -1,0 +1,16 @@
+Loading image from ../data/mandrill_blurry.png
+running lucy iterations...
+Iteration number: 1, 
+Execution time: 174450microseconds
+PSNR: 30.703
+Image saved to: ./output/benchmarks/mandrill_deblur_gaussKernel3.png
+running lucy iterations...
+Iteration number: 1, 
+Execution time: 781733microseconds
+PSNR: 30.703
+Image saved to: ./output/benchmarks/mandrill_deblur_gaussKernel7.png
+running simple filter...
+Execution time: 76706microseconds
+PSNR: 30.6846
+Image saved to: ./output/benchmarks/mandrill_deblur_sharpen3.png
+Blurry Image PSNR: 30.7024

@@ -1,0 +1,16 @@
+Loading image from ../data/star_blurry.png
+running lucy iterations...
+Iteration number: 1, 
+Execution time: 2444081microseconds
+PSNR: 20.6411
+Image saved to: ./output/benchmarks/star_deblur_gaussKernel3.png
+running lucy iterations...
+Iteration number: 1, 
+Execution time: 8436411microseconds
+PSNR: 20.642
+Image saved to: ./output/benchmarks/star_deblur_gaussKernel7.png
+running simple filter...
+Execution time: 757774microseconds
+PSNR: 20.4909
+Image saved to: ./output/benchmarks/star_deblur_sharpen3.png
+Blurry Image PSNR: 25.2922

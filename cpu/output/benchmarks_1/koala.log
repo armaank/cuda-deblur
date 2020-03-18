@@ -1,0 +1,16 @@
+Loading image from ../data/koala_blurry.png
+running lucy iterations...
+Iteration number: 1, 
+Execution time: 3460587microseconds
+PSNR: 30.1525
+Image saved to: ./output/benchmarks/koala_deblur_gaussKernel3.png
+running lucy iterations...
+Iteration number: 1, 
+Execution time: 15843924microseconds
+PSNR: 30.18
+Image saved to: ./output/benchmarks/koala_deblur_gaussKernel7.png
+running simple filter...
+Execution time: 1543566microseconds
+PSNR: 30.6979
+Image saved to: ./output/benchmarks/koala_deblur_sharpen3.png
+Blurry Image PSNR: 30.7089

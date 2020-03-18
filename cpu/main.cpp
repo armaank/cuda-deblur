@@ -6,7 +6,7 @@
 #include "cpuLucyRichardson.hpp"
 #include "../benchmarks/metrics.hpp"
 
-#define NUM_ITERATIONS 5
+#define NUM_ITERATIONS 1  
 
 Image loadImage(const std::string &filename);
 void saveImage(Image &image, const std::string &filename);
@@ -23,7 +23,7 @@ int main(int argc, char **argv)
         std::cerr << "error: specify input and output files" << std::endl;
         return -1;
     }
-    std::cout << "Loading image from" << input_file << std::endl;
+    std::cout << "Loading image from " << input_file << std::endl;
     Image image = loadImage(input_file);
     Image target_image = loadImage(target_file);
     /////////////////////////////////////////////////////////////////////////
@@ -42,7 +42,7 @@ int main(int argc, char **argv)
 
     // baseline psnr calculation
     double baseline_psnr = psnr(image, target_image);
-    std::cout << "Blurry Image PSNR:" << baseline_psnr << std::endl;
+    std::cout << "Blurry Image PSNR: " << baseline_psnr << std::endl;
     /////////////////////////////////////////////////////////////////////////
 
     return 0;

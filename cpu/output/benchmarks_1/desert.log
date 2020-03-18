@@ -1,0 +1,16 @@
+Loading image from ../data/desert_blurry.png
+running lucy iterations...
+Iteration number: 1, 
+Execution time: 3458137microseconds
+PSNR: 30.1827
+Image saved to: ./output/benchmarks/desert_deblur_gaussKernel3.png
+running lucy iterations...
+Iteration number: 1, 
+Execution time: 15767603microseconds
+PSNR: 30.2946
+Image saved to: ./output/benchmarks/desert_deblur_gaussKernel7.png
+running simple filter...
+Execution time: 1546374microseconds
+PSNR: 30.7084
+Image saved to: ./output/benchmarks/desert_deblur_sharpen3.png
+Blurry Image PSNR: 30.7166

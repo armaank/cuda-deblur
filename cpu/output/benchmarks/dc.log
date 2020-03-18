@@ -1,0 +1,16 @@
+Loading image from ../data/dc_blurry.png
+running lucy iterations...
+Iteration number: 1, 
+Execution time: 4634743microseconds
+PSNR: 24.0545
+Image saved to: ./output/benchmarks/dc_deblur_gaussKernel3.png
+running lucy iterations...
+Iteration number: 1, 
+Execution time: 16002191microseconds
+PSNR: 24.0537
+Image saved to: ./output/benchmarks/dc_deblur_gaussKernel7.png
+running simple filter...
+Execution time: 1438832microseconds
+PSNR: 23.7508
+Image saved to: ./output/benchmarks/dc_deblur_sharpen3.png
+Blurry Image PSNR: 24.612

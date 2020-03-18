@@ -31,8 +31,9 @@ double psnr(const Image &im1, const Image &im2)
 	/* compute mse */
 	double mse = _mse(im1, im2);
 
-	/* from mse, compute psnr */
-	double psnr = .1 * log10(std::numeric_limits<double>::max() / sqrt(mse));
-
+	double MAX = 255;
+	/* from mse, compute psnr - a little fishy, can change latter */
+	double psnr = 10 * log10(pow(MAX, 2)/ mse);
 	return psnr;
 }
+

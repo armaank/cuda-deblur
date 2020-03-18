@@ -1,0 +1,16 @@
+Loading image from ../data/beach_blurry.png
+running lucy iterations...
+Iteration number: 1, 
+Execution time: 7779765microseconds
+PSNR: 24.0045
+Image saved to: ./output/benchmarks/beach_deblur_gaussKernel3.png
+running lucy iterations...
+Iteration number: 1, 
+Execution time: 26739789microseconds
+PSNR: 24.0065
+Image saved to: ./output/benchmarks/beach_deblur_gaussKernel7.png
+running simple filter...
+Execution time: 2408778microseconds
+PSNR: 23.9599
+Image saved to: ./output/benchmarks/beach_deblur_sharpen3.png
+Blurry Image PSNR: 29.7274

@@ -1,0 +1,16 @@
+Loading image from ../data/mount_blurry.png
+running lucy iterations...
+Iteration number: 1, 
+Execution time: 2896981microseconds
+PSNR: 30.712
+Image saved to: ./output/benchmarks/mount_deblur_gaussKernel3.png
+running lucy iterations...
+Iteration number: 1, 
+Execution time: 13156577microseconds
+PSNR: 30.712
+Image saved to: ./output/benchmarks/mount_deblur_gaussKernel7.png
+running simple filter...
+Execution time: 1297317microseconds
+PSNR: 30.7031
+Image saved to: ./output/benchmarks/mount_deblur_sharpen3.png
+Blurry Image PSNR: 30.7113
