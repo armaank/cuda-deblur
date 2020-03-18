@@ -1,0 +1,10 @@
+Loading image from ../data/tulips_blurry.png
+Iteration number: 1, 
+Execution time: 2292255 microseconds
+PSNR: 26.57
+Image saved to: ./output/benchmarks/tulips_deblur_gaussKernel3.png
+Iteration number: 1, 
+Execution time: 7588349 microseconds
+PSNR: 26.5743
+Image saved to: ./output/benchmarks/tulips_deblur_gaussKernel7.png
+Blurry Image PSNR: 30.4895

@@ -1,0 +1,10 @@
+Loading image from ../data/penguins_blurry.png
+Iteration number: 1, 
+Execution time: 2043483 microseconds
+PSNR: 22.1359
+Image saved to: ./output/benchmarks/penguins_deblur_gaussKernel3.png
+Iteration number: 1, 
+Execution time: 8611684 microseconds
+PSNR: 22.1381
+Image saved to: ./output/benchmarks/penguins_deblur_gaussKernel7.png
+Blurry Image PSNR: 25.4573

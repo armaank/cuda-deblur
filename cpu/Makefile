@@ -2,14 +2,17 @@ CC = g++ # compiler
 CXXFLAGS = -std=c++11 # flags
 PNG_LIB = `libpng-config --ldflags`
 
-make: main.cpp cpuLucyRichardson.o benchmarks.o
-	$(CC) $(CXXFLAGS) main.cpp cpuLucyRichardson.cpp ../benchmarks/metrics.cpp $(PNG_LIB) -o deblur.out
+make: main.cpp cpuDeblur.o benchmarks.o ops.o
+	$(CC) $(CXXFLAGS) main.cpp cpuDeblur.cpp ops.cpp ../benchmarks/metrics.cpp $(PNG_LIB) -o deblur.out
 
-debug: main.cpp cpuLucyRichardson.o benchmarks.o
-	$(CC) $(CXXFLAGS) -g main.cpp cpuLucyRichardson.cpp ../benchmarks/metrics.cpp $(PNG_LIB)
+debug: main.cpp cpuDeblur.o benchmarks.o ops.o
+	$(CC) $(CXXFLAGS) -g main.cpp cpuDeblur.cpp ops.cpp ../benchmarks/metrics.cpp $(PNG_LIB)
 
-cpuLucyRichardson.o: cpuLucyRichardson.cpp cpuLucyRichardson.hpp
-	$(CC) $(CXXFLAGS) -c cpuLucyRichardson.cpp
+cpuDeblur.o: cpuDeblur.cpp cpuDeblur.hpp ops.o
+	$(CC) $(CXXFLAGS) -g -c cpuDeblur.cpp ops.cpp 
+
+ops.o: ops.cpp ops.hpp
+	$(CC) $(CXXFLAGS) -c ops.cpp
 
 benchmarks.o: ../benchmarks/metrics.cpp ../benchmarks/metrics.hpp
 	$(CC) $(CXXFLAGS) -c ../benchmarks/metrics.cpp

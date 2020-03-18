@@ -1,0 +1,10 @@
+Loading image from ../data/lighthouse_blurry.png
+Iteration number: 1, 
+Execution time: 2196572 microseconds
+PSNR: 24.6796
+Image saved to: ./output/benchmarks/lighthouse_deblur_gaussKernel3.png
+Iteration number: 1, 
+Execution time: 7977970 microseconds
+PSNR: 24.6794
+Image saved to: ./output/benchmarks/lighthouse_deblur_gaussKernel7.png
+Blurry Image PSNR: 27.3851
