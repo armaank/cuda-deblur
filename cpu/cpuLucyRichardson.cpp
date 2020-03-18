@@ -126,14 +126,14 @@ Image rlDeconv(const Image &image, const Matrix &filter, const int n_iter)
         for (int d = 0; d < 3; d++) /* element-wise division to compute relative blur */
             rel_blur[d] = divide(image[d], tmp1[d]);
 
-        Image tmp2 = conv(rel_blur, filter); /* filter blur by psf */
+        Image tmp2 = conv(rel_blur, filter_m); /* filter blur by psf */
 
         for (int d = 0; d < 3; d++) /* element-wise multiply to update deblurred image */
             im_deconv[d] = multiply(tmp2[d], im_deconv[d]);
     }
    Matrix filter_sharp = sharpen(3,3);
    im_deconv = conv(im_deconv, filter_sharp);
-    std::cout << "\n";
+   std::cout << "\n";
 
     return im_deconv;
 }
