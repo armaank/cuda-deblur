@@ -12,7 +12,8 @@
 #define NUM_ITERATIONS 5
 
 
-void runLucyRichardson(const Matrix &kernel, const Image &blurry_image, const Image &target_image, const std::string &output_file);
+void runLucyRichardson(double *filter_ptr, double *filter_mirror_ptr, double *image_ptr, double *output_ptr, 
+    const Image &target_image, const std::string &output_file, int filter_width, int filter_height);
 void runSimpleFilter(const Matrix &kernel, const Image &blurry_image, const Image &target_image, const std::string &output_file);
 
 Matrix createMatrix(const int height, const int width);
@@ -40,18 +41,43 @@ int main(int argc, char **argv)
     Image image = loadImage(input_file);
     Image target_image = loadImage(target_file);
 
+    double *image_ptr  = image2ptr(image);
+    double *output_ptr = new (std::nothrow) double[3*image[0].size()*image[0][0].size()];
+
+
+
     /////////////////////////////////////////////////////////////////////////
 
     // Kernel: gaussian 3x3
     Matrix filter = gaussian(3, 3, 1);
-    runLucyRichardson(filter, image, target_image, output_file+"_gaussKernel3"+ ".png");
-
+    int filter_width  = filter[0].size(); 
+    int filter_height = filter.size(); 
+    Matrix filter_m = createMatrix(filter_height, filter_width);
+    for (int i = 0; i < filter_height; i++)
+        for (int j = 0; j < filter_width; j++)
+            filter_m[i][j] = filter[j][i];
+    
+    double *filter_ptr = matrix2ptr(filter);    
+    double *filter_mirror_ptr = matrix2ptr(filter_m);
+    runLucyRichardson(filter_ptr, filter_mirror_ptr, image_ptr, output_ptr, target_image, 
+        output_file+"_gaussKernel3"+ ".png", filter_width, filter_height);
+    
     // Kernel: gaussian 7x7
-    filter = gaussian(7, 7, 1);
-    runLucyRichardson(filter, image, target_image, output_file+"_gaussKernel7"+ ".png");
+    // filter = gaussian(7, 7, 1);
+    // filter_width  = filter[0].size(); 
+    // filter_height = filter.size(); 
+    // filter_m = createMatrix(filter_height, filter_width);
+    // for (int i = 0; i < filter_height; i++)
+    //     for (int j = 0; j < filter_width; j++)
+    //         filter_m[i][j] = filter[j][i];
 
-    filter = sharpen(3,3);
-    runSimpleFilter(filter, image, target_image, output_file+"_sharpen3"+".png");
+    // filter_ptr = matrix2ptr(filter);    
+    // filter_mirror_ptr = matrix2ptr(filter_m);
+    // runLucyRichardson(filter_ptr, filter_mirror_ptr, image_ptr, output_ptr, target_image, 
+    //     output_file+"_gaussKernel7"+ ".png", filter_width, filter_height);
+
+    // filter = sharpen(3,3);
+    // runSimpleFilter(filter, image, target_image, output_file+"_sharpen3"+".png");
 
     std::cout << "Done!" << std::endl;
     
@@ -61,143 +87,132 @@ int main(int argc, char **argv)
     return 0;
 }
 
-void runSimpleFilter(const Matrix &filter, const Image &blurry_image, const Image &target_image, const std::string &output_file)
-{
-    std::cout << "running lucy iterations..." << std::endl;
+// void runSimpleFilter(const Matrix &filter, const Image &blurry_image, const Image &target_image, const std::string &output_file)
+// {
+//     std::cout << "running lucy iterations..." << std::endl;
     
+//     /* initalize gpu timers */
+//     GpuTimer gputime_gpu;
+    
+//     int element_count = 3*blurry_image[0].size()*blurry_image[0][0].size(); 
+//     int size = element_count*sizeof(double);
+//     double *image_ptr  = image2ptr(blurry_image);
+//     double *output_ptr = new (std::nothrow) double[element_count];
+//     double *filter_ptr = matrix2ptr(filter);    
+
+//     cudaError_t err = cudaSuccess;  // Error code to check return values for CUDA calls
+
+//     gputime_gpu.start();
+
+//     // Allocate the device input vector f
+//     double *d_f = NULL;
+//     err = cudaMalloc((void **)&d_f, size);
+//     if (err != cudaSuccess)
+//     {
+//         fprintf(stderr, "Failed to allocate device vector f (error code %s)!\n", cudaGetErrorString(err));
+//         exit(EXIT_FAILURE);
+//     }
+
+//     // Allocate the device input vector g
+//     double *d_g = NULL;
+//     err = cudaMalloc((void **)&d_g, size);
+//     if (err != cudaSuccess)
+//     {
+//         fprintf(stderr, "Failed to allocate device vector g (error code %s)!\n", cudaGetErrorString(err));
+//         exit(EXIT_FAILURE);
+//     }
+
+//     // Allocate the device output vector c
+//     double *d_c = NULL;
+//     err = cudaMalloc((void **)&d_c, size);
+//     if (err != cudaSuccess)
+//     {
+//         fprintf(stderr, "Failed to allocate device vector c (error code %s)!\n", cudaGetErrorString(err));
+//         exit(EXIT_FAILURE);
+//     }
+
+//     // Copy the host input vectors f, g, and c in host memory to the device input vectors in device memory
+//     printf("Copy input data from the host memory to the CUDA device\n");
+//     err = cudaMemcpy(d_g, filter_ptr, filter.size()*filter[0].size(), cudaMemcpyHostToDevice);
+//     if (err != cudaSuccess)
+//     {
+//         fprintf(stderr, "Failed to copy vector g from host to device (error code %s)!\n", cudaGetErrorString(err));
+//         exit(EXIT_FAILURE);
+//     }
+
+//     err = cudaMemcpy(d_c, image_ptr, size, cudaMemcpyHostToDevice);
+//     if (err != cudaSuccess)
+//     {
+//         fprintf(stderr, "Failed to copy vector c from host to device (error code %s)!\n", cudaGetErrorString(err));
+//         exit(EXIT_FAILURE);
+//     }
+
+//     // convolve filter and image
+//     int threadsPerBlock = 256;
+//     int blocksPerGrid =(blurry_image[0].size()*blurry_image[0][0].size() + threadsPerBlock - 1) / threadsPerBlock;
+//     kernel_convolve<<<blocksPerGrid, threadsPerBlock>>>(d_c, d_g, d_f, blurry_image[0][0].size(), blurry_image[0].size());
+//     err = cudaGetLastError();
+//     if (err != cudaSuccess)
+//     {
+//         fprintf(stderr, "Failed to launch KernelConvolve kernel (error code %s)!\n", cudaGetErrorString(err));
+//         exit(EXIT_FAILURE);
+//     }
+
+//     // de-allocate device arrays
+//     err = cudaFree(d_f);
+//     if (err != cudaSuccess)
+//     {
+//         fprintf(stderr, "Failed to free device vector f (error code %s)!\n", cudaGetErrorString(err));
+//         exit(EXIT_FAILURE);
+//     }
+
+//     err = cudaFree(d_c);
+//     if (err != cudaSuccess)
+//     {
+//         fprintf(stderr, "Failed to free device vector c (error code %s)!\n", cudaGetErrorString(err));
+//         exit(EXIT_FAILURE);
+//     }
+
+//     err = cudaFree(d_g);
+//     if (err != cudaSuccess)
+//     {
+//         fprintf(stderr, "Failed to free device vector g (error code %s)!\n", cudaGetErrorString(err));
+//         exit(EXIT_FAILURE);
+//     }
+
+//     // compute psnr
+//     gputime_gpu.stop();
+
+//     Image output = ptr2image(output_ptr, blurry_image[0][0].size(), blurry_image[0].size());
+
+//     std::cout << "Total time Elapsed - GPU: " << gputime_gpu.elapsed_time() << " ms" << std::endl;
+
+//     std::cout << "PSNR: " << psnr(output, target_image) << std::endl;
+
+//     saveImage(output, output_file);
+//     std::cout << "Image saved to: " << output_file << std::endl;
+// }
+
+void runLucyRichardson(double *filter_ptr, double *filter_mirror_ptr, double *image_ptr, double *output_ptr, 
+    const Image &target_image, const std::string &output_file, int filter_width, int filter_height)
+{  
     /* initalize gpu timers */
     GpuTimer gputime_gpu;
-    
-    int size = 3*blurry_image[0].size()*blurry_image[0][0].size();
-    double *image_ptr  = image2ptr(blurry_image);
-    double *output_ptr = new (std::nothrow) double[size];
-    double *filter_ptr = matrix2ptr(filter);    
-
-    cudaError_t err = cudaSuccess;  // Error code to check return values for CUDA calls
-
     gputime_gpu.start();
+    int height = target_image[0].size();
+    int width = target_image[0][0].size();
+    int filter_size = filter_width*filter_height*sizeof(double);
+    int element_count = 3*height*width;
+    int size = element_count*sizeof(double);
 
-    // Allocate the device input vector f
-    double *d_f = NULL;
-    err = cudaMalloc((void **)&d_f, size);
-    if (err != cudaSuccess)
-    {
-        fprintf(stderr, "Failed to allocate device vector f (error code %s)!\n", cudaGetErrorString(err));
-        exit(EXIT_FAILURE);
-    }
-
-    // Allocate the device input vector g
-    double *d_g = NULL;
-    err = cudaMalloc((void **)&d_g, size);
-    if (err != cudaSuccess)
-    {
-        fprintf(stderr, "Failed to allocate device vector g (error code %s)!\n", cudaGetErrorString(err));
-        exit(EXIT_FAILURE);
-    }
-
-    // Allocate the device output vector c
-    double *d_c = NULL;
-    err = cudaMalloc((void **)&d_c, size);
-    if (err != cudaSuccess)
-    {
-        fprintf(stderr, "Failed to allocate device vector c (error code %s)!\n", cudaGetErrorString(err));
-        exit(EXIT_FAILURE);
-    }
-
-    // Copy the host input vectors f, g, and c in host memory to the device input vectors in device memory
-    printf("Copy input data from the host memory to the CUDA device\n");
-    err = cudaMemcpy(d_g, filter_ptr, filter.size()*filter[0].size(), cudaMemcpyHostToDevice);
-    if (err != cudaSuccess)
-    {
-        fprintf(stderr, "Failed to copy vector g from host to device (error code %s)!\n", cudaGetErrorString(err));
-        exit(EXIT_FAILURE);
-    }
-
-    err = cudaMemcpy(d_c, image_ptr, size, cudaMemcpyHostToDevice);
-    if (err != cudaSuccess)
-    {
-        fprintf(stderr, "Failed to copy vector c from host to device (error code %s)!\n", cudaGetErrorString(err));
-        exit(EXIT_FAILURE);
-    }
-
-    // convolve filter and image
-    int threadsPerBlock = 256;
-    int blocksPerGrid =(blurry_image[0].size()*blurry_image[0][0].size() + threadsPerBlock - 1) / threadsPerBlock;
-    kernel_convolve<<<blocksPerGrid, threadsPerBlock>>>(d_c, d_g, d_f, blurry_image[0][0].size(), blurry_image[0].size());
-    err = cudaGetLastError();
-    if (err != cudaSuccess)
-    {
-        fprintf(stderr, "Failed to launch KernelConvolve kernel (error code %s)!\n", cudaGetErrorString(err));
-        exit(EXIT_FAILURE);
-    }
-
-    // de-allocate device arrays
-    err = cudaFree(d_f);
-    if (err != cudaSuccess)
-    {
-        fprintf(stderr, "Failed to free device vector f (error code %s)!\n", cudaGetErrorString(err));
-        exit(EXIT_FAILURE);
-    }
-
-    err = cudaFree(d_c);
-    if (err != cudaSuccess)
-    {
-        fprintf(stderr, "Failed to free device vector c (error code %s)!\n", cudaGetErrorString(err));
-        exit(EXIT_FAILURE);
-    }
-
-    err = cudaFree(d_g);
-    if (err != cudaSuccess)
-    {
-        fprintf(stderr, "Failed to free device vector g (error code %s)!\n", cudaGetErrorString(err));
-        exit(EXIT_FAILURE);
-    }
-
-    // compute psnr
-    gputime_gpu.stop();
-
-    Image output = ptr2image(output_ptr, blurry_image[0][0].size(), blurry_image[0].size());
-
-    std::cout << "Total time Elapsed - GPU: " << gputime_gpu.elapsed_time() << " ms" << std::endl;
-
-    std::cout << "PSNR: " << psnr(output, target_image) << std::endl;
-
-    saveImage(output, output_file);
-    std::cout << "Image saved to: " << output_file << std::endl;
-}
-
-
-void runLucyRichardson(const Matrix &filter, const Image &blurry_image, const Image &target_image, const std::string &output_file)
-{
-    std::cout << "running lucy iterations..." << std::endl;
-    
-    /* initalize gpu timers */
-    GpuTimer gputime_lucy;
-    GpuTimer gputime_gpu;
-
-    int size = 3*blurry_image[0].size()*blurry_image[0][0].size();
-
-    double *image_ptr  = image2ptr(blurry_image);
-    double *output_ptr = new (std::nothrow) double[size];
-
-    int filter_size = filter.size()*filter[0].size();
-    Matrix filter_m(filter.size(), Array(filter[0].size()));
-    for (int i = 0; i < filter.size(); i++)
-        for (int j = 0; j < filter[0].size(); j++)
-            filter_m[i][j] = filter[j][i];
-
-    double *filter_ptr = matrix2ptr(filter);    
-    double *filter_mirror_ptr = matrix2ptr(filter_m);
-            
     cudaError_t err = cudaSuccess;  // Error code to check return values for CUDA calls
 
-
-    // Allocate the device input vector f
+    // Allocate the device output vector f
     double *d_f = NULL;
     err = cudaMalloc((void **)&d_f, size);
     if (err != cudaSuccess)
     {
-        fprintf(stderr, "Failed to allocate device vector f (error code %s)!\n", cudaGetErrorString(err));
+        std::cerr << "Failed to allocate device vector f (error code " << cudaGetErrorString(err) << ")!" << std::endl;
         exit(EXIT_FAILURE);
     }
 
@@ -206,7 +221,7 @@ void runLucyRichardson(const Matrix &filter, const Image &blurry_image, const Im
     err = cudaMalloc((void **)&d_g, size);
     if (err != cudaSuccess)
     {
-        fprintf(stderr, "Failed to allocate device vector g (error code %s)!\n", cudaGetErrorString(err));
+        std::cerr << "Failed to allocate device vector g (error code " << cudaGetErrorString(err) << ")!" << std::endl;
         exit(EXIT_FAILURE);
     }
 
@@ -215,7 +230,7 @@ void runLucyRichardson(const Matrix &filter, const Image &blurry_image, const Im
     err = cudaMalloc((void **)&d_g_m, size);
     if (err != cudaSuccess)
     {
-        fprintf(stderr, "Failed to allocate device vector g_m (error code %s)!\n", cudaGetErrorString(err));
+        std::cerr << "Failed to allocate device vector g_m (error code " << cudaGetErrorString(err) << ")!" << std::endl;
         exit(EXIT_FAILURE);
     }
 
@@ -224,23 +239,23 @@ void runLucyRichardson(const Matrix &filter, const Image &blurry_image, const Im
     err = cudaMalloc((void **)&d_c, size);
     if (err != cudaSuccess)
     {
-        fprintf(stderr, "Failed to allocate device vector c (error code %s)!\n", cudaGetErrorString(err));
+        std::cerr << "Failed to allocate device vector c (error code " << cudaGetErrorString(err) << ")!" << std::endl;
         exit(EXIT_FAILURE);
     }
 
     // Copy the host input vectors f, g, and c in host memory to the device input vectors in device memory
-    printf("Copy input data from the host memory to the CUDA device\n");
+    std::cout << "Copy input data from the host memory to the CUDA device." << std::endl;
     err = cudaMemcpy(d_g, filter_ptr, filter_size, cudaMemcpyHostToDevice);
     if (err != cudaSuccess)
     {
-        fprintf(stderr, "Failed to copy vector g from host to device (error code %s)!\n", cudaGetErrorString(err));
+        std::cerr << "Failed to copy vector g from host to device (error code " << cudaGetErrorString(err) << ")!" << std::endl;
         exit(EXIT_FAILURE);
     }
 
     err = cudaMemcpy(d_g_m, filter_mirror_ptr, filter_size, cudaMemcpyHostToDevice);
     if (err != cudaSuccess)
     {
-        fprintf(stderr, "Failed to copy vector g_m from host to device (error code %s)!\n", cudaGetErrorString(err));
+        std::cerr << "Failed to copy vector g_m from host to device (error code " << cudaGetErrorString(err) << ")!" << std::endl;
         exit(EXIT_FAILURE);
     }
 
@@ -275,23 +290,20 @@ void runLucyRichardson(const Matrix &filter, const Image &blurry_image, const Im
         exit(EXIT_FAILURE);
     }
 
-    // TODO: time this loop, i guess?
-    /* 
-    maybe it's not a bad idea to use two timers. One that times the cpu and gpu lucy iterations, and 
-    one that times the entire process for cpu and gpu, that way we know what the overhead is and factor 
-    that into our analysis -armaan
-    */
+    std::cout << "running lucy iterations... ";
     for (int i=0; i<NUM_ITERATIONS; ++i)
     {
-        updateUnderlyingImg(d_c, d_g, d_g_m, d_f, d_tmp1, d_tmp2, blurry_image[0][0].size(), blurry_image[0].size());
+        std::cout << i+1 << ", " << std::flush;
+        updateUnderlyingImg(d_c, d_g, d_g_m, d_f, d_tmp1, d_tmp2, width, height, filter_width, filter_height);
     }
+    std::cout << std::endl;
 
     // Copy the device result vector in device memory to the host result vector in host memory.
-    printf("Copy output data from the CUDA device to the host memory\n");
+    std::cout << "Copy output data from the CUDA device to the host memory" << std::endl;
     err = cudaMemcpy(output_ptr, d_f, size, cudaMemcpyDeviceToHost);
     if (err != cudaSuccess)
     {
-        fprintf(stderr, "Failed to copy vector f from device to host (error code %s)!\n", cudaGetErrorString(err));
+        std::cerr << "Failed to copy vector f from device to host (error code " << cudaGetErrorString(err) << ")!" << std::endl;
         exit(EXIT_FAILURE);
     }
 
@@ -299,50 +311,51 @@ void runLucyRichardson(const Matrix &filter, const Image &blurry_image, const Im
     err = cudaFree(d_f);
     if (err != cudaSuccess)
     {
-        fprintf(stderr, "Failed to free device vector f (error code %s)!\n", cudaGetErrorString(err));
+        std::cerr << "Failed to free device vector f (error code " << cudaGetErrorString(err) << ")!" << std::endl;
         exit(EXIT_FAILURE);
     }
 
     err = cudaFree(d_c);
     if (err != cudaSuccess)
     {
-        fprintf(stderr, "Failed to free device vector c (error code %s)!\n", cudaGetErrorString(err));
+        std::cerr << "Failed to free device vector c (error code " << cudaGetErrorString(err) << ")!" << std::endl;
         exit(EXIT_FAILURE);
     }
 
     err = cudaFree(d_g);
     if (err != cudaSuccess)
     {
-        fprintf(stderr, "Failed to free device vector g (error code %s)!\n", cudaGetErrorString(err));
+        std::cerr << "Failed to free device vector g (error code " << cudaGetErrorString(err) << ")!" << std::endl;
         exit(EXIT_FAILURE);
     }
     
     err = cudaFree(d_g_m);
     if (err != cudaSuccess)
     {
-        fprintf(stderr, "Failed to free device vector g (error code %s)!\n", cudaGetErrorString(err));
+        std::cerr << "Failed to free device vector g_m (error code " << cudaGetErrorString(err) << ")!" << std::endl;
         exit(EXIT_FAILURE);
     }
 
     err = cudaFree(d_tmp1);
     if (err != cudaSuccess)
     {
-        fprintf(stderr, "Failed to free device vector tmp1 (error code %s)!\n", cudaGetErrorString(err));
+        std::cerr << "Failed to free device vector tmp1 (error code " << cudaGetErrorString(err) << ")!" << std::endl;
         exit(EXIT_FAILURE);
     }
 
     err = cudaFree(d_tmp2);
     if (err != cudaSuccess)
     {
-        fprintf(stderr, "Failed to free device vector tmp2 (error code %s)!\n", cudaGetErrorString(err));
+        std::cerr << "Failed to free device vector tmp2 (error code " << cudaGetErrorString(err) << ")!" << std::endl;
         exit(EXIT_FAILURE);
     }
 
-    Image output = ptr2image(output_ptr, blurry_image[0][0].size(), blurry_image[0].size());
+    Image output = ptr2image(output_ptr, width, height);
+    gputime_gpu.stop();
 
     std::cout << "Total time Elapsed - GPU: " << gputime_gpu.elapsed_time() << " ms" << std::endl;
-    std::cout << "Lucy Iteration time Elapsed - GPU: " << gputime_lucy.elapsed_time() << " ms" << std::endl; 
 
+    std::cout << "BaselinePSNR: " << psnr(ptr2image(image_ptr, width, height), target_image) << std::endl;
     std::cout << "PSNR: " << psnr(output, target_image) << std::endl;
 
     saveImage(output, output_file);
@@ -388,7 +401,7 @@ double *matrix2ptr(const Matrix &input)
 
 Image ptr2image(const double *input, const int width, const int height)
 {
-    Image output(3, Matrix(height, std::vector<double>(width, 0)));
+    Image output(3, createMatrix(height, width) );
 
     int idx = 0;
     for (int i = 0; i < height; ++i)
@@ -421,7 +434,7 @@ Matrix gaussian(const int height, const int width, const double sigma)
     for (int i = 0; i < height; i++)
         for (int j = 0; j < width; j++)
             kernel[i][j] /= sum;
-
+            
     return kernel;
 }
 

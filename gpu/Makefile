@@ -296,7 +296,7 @@ LINKLINE = $(LINK) $(OBJS) $(PNG_LIB) $(COMMONFLAGS) $(LIB_CUDA)
 
 all: gpuLucyRich
 
-gpuLucyRich: $(OBJS) Makefile
+gpuLucyRich: $(OBJS) gpuLucyRichardson.cu
 	$(LINKLINE) -o $@
 	
 %.c.o: %.c
