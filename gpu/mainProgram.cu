@@ -191,7 +191,6 @@ void runLucyRichardson(const Matrix &filter, const Image &blurry_image, const Im
             
     cudaError_t err = cudaSuccess;  // Error code to check return values for CUDA calls
 
-    gputime_gpu.start();
 
     // Allocate the device input vector f
     double *d_f = NULL;
@@ -282,12 +281,10 @@ void runLucyRichardson(const Matrix &filter, const Image &blurry_image, const Im
     one that times the entire process for cpu and gpu, that way we know what the overhead is and factor 
     that into our analysis -armaan
     */
-    gputime_lucy.start();
     for (int i=0; i<NUM_ITERATIONS; ++i)
     {
         updateUnderlyingImg(d_c, d_g, d_g_m, d_f, d_tmp1, d_tmp2, blurry_image[0][0].size(), blurry_image[0].size());
     }
-    gputime_lucy.stop();
 
     // Copy the device result vector in device memory to the host result vector in host memory.
     printf("Copy output data from the CUDA device to the host memory\n");
@@ -340,7 +337,6 @@ void runLucyRichardson(const Matrix &filter, const Image &blurry_image, const Im
         fprintf(stderr, "Failed to free device vector tmp2 (error code %s)!\n", cudaGetErrorString(err));
         exit(EXIT_FAILURE);
     }
-    gputime_gpu.stop();
 
     Image output = ptr2image(output_ptr, blurry_image[0][0].size(), blurry_image[0].size());
 

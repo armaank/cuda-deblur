@@ -275,7 +275,7 @@ endif
 # Target rules
 CXX := g++
 CC:=gcc
-LINK := g++ -fPIC
+LINK := g++
 
 # Includes
 INCLUDES = -I. -I$(CUDA_PATH)/include
@@ -283,15 +283,14 @@ INCLUDES = -I. -I$(CUDA_PATH)/include
 # Common flags
 COMMONFLAGS += $(INCLUDES)
 NVCCFLAGS += $(COMMONFLAGS)
-CXXFLAGS += $(COMMONFLAGS)
+CXXFLAGS += $(COMMONFLAGS) -std=c++11 
 CFLAGS += $(COMMONFLAGS)
 
-LIB_CUDA := -L$(CUDA_PATH)/lib -lcudart
+LIB_CUDA := -L$(CUDA_PATH)/lib64 -lcudart
 PNG_LIB = `libpng-config --ldflags`
 
-OBJS = benchmarks.o mainProgram.cu.o gpuLucyRichardson.cu.o 
-TARGET = exec
-LINKLINE = $(LINK) -o $(TARGET) $(OBJS) $(LIB_CUDA)
+OBJS = pngConnector.o metrics.o mainProgram.cu.o
+LINKLINE = $(LINK) $(OBJS) $(PNG_LIB) $(COMMONFLAGS) $(LIB_CUDA)
 
 .SUFFIXES: .c .cpp .cu .o
 
@@ -304,13 +303,16 @@ gpuLucyRich: $(OBJS) Makefile
 	$(CC) $(CFLAGS) -c $< -o $@
 
 %.cu.o: %.cu
-	$(NVCC) $(NVCCFLAGS) -c $< -o $@
+	$(NVCC) $(NVCCFLAGS) -c $< -o $@ 
 
 %.cpp.o: %.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@$ $(PNG_LIB)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-benchmarks.o: ../benchmarks/metrics.cpp ../benchmarks/metrics.hpp
+metrics.o: ../benchmarks/metrics.cpp ../benchmarks/metrics.hpp 
 	$(CXX) $(CXXFLAGS) -c ../benchmarks/metrics.cpp
+
+pngConnector.o: pngConnector.cpp pngConnector.hpp
+	$(CXX) $(CXXFLAGS) -c pngConnector.cpp 
 
 clean:
 	rm *.o 
