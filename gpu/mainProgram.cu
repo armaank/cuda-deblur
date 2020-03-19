@@ -61,7 +61,7 @@ int main(int argc, char **argv)
             filter_m[i][j] = filter[j][i];
     
     Matrix s_filter = sharpen(3,3);
-    int s_filter_width = s_filter[0].size;
+    int s_filter_width = s_filter[0].size();
     int s_filter_height = s_filter.size();
     
 
@@ -69,9 +69,9 @@ int main(int argc, char **argv)
     double *filter_mirror_ptr = matrix2ptr(filter_m);
     double *s_filter_ptr = matrix2ptr(s_filter);
 
-    //runLucyRichardson(filter_ptr, filter_mirror_ptr, image_ptr, output_ptr, target_image, 
-    //    output_file+"_gaussKernel3"+ ".png", filter_width, filter_height);
-    gpuDeblur(filter_ptr, filter_mirror_ptr, image_ptr, output_ptr, target_image, output_file + "_gaussKernel3"+".png", filter_width, filter_height, s_filter_ptr, S_filter_width, s_filter_height)
+//    runLucyRichardson(filter_ptr, filter_mirror_ptr, image_ptr, output_ptr, target_image, 
+  //      output_file+"_gaussKernel3"+ ".png", filter_width, filter_height);
+    gpuDeblur(filter_ptr, filter_mirror_ptr, image_ptr, output_ptr, target_image, output_file + "_gaussKernel3"+".png", filter_width, filter_height, s_filter_ptr, s_filter_width, s_filter_height);
 
 
 
@@ -207,7 +207,7 @@ int main(int argc, char **argv)
 // }
 
 void gpuDeblur(double *filter_ptr, double *filter_mirror_ptr, double *image_ptr, double *output_ptr,
-    const Image &target_image, const std::string &output_file, int filter_width, int filter_height, double *s_filter_ptr, int s_filter_width, int s_filter_height);
+    const Image &target_image, const std::string &output_file, int filter_width, int filter_height, double *s_filter_ptr, int s_filter_width, int s_filter_height)
 {
     /* initalize gpu timers */
     GpuTimer gputime_gpu;
@@ -217,7 +217,7 @@ void gpuDeblur(double *filter_ptr, double *filter_mirror_ptr, double *image_ptr,
     int filter_size = filter_width*filter_height*sizeof(double);
     int element_count = 3*height*width;
     int size = element_count*sizeof(double);
-    int s_filter_size = s_filter_Width*s_filter_height*sizeof(double);
+    int s_filter_size = s_filter_width*s_filter_height*sizeof(double);
 
     cudaError_t err = cudaSuccess;  // Error code to check return values for CUDA calls
 
@@ -251,7 +251,7 @@ void gpuDeblur(double *filter_ptr, double *filter_mirror_ptr, double *image_ptr,
 
     // Allocate device inout vector s (sharpening filter)
     double *d_s = NULL;
-    err = cudaMalloc((void **)&s, size);
+    err = cudaMalloc((void **)&d_s, size);
     if (err != cudaSuccess)
     {
         std::cerr << "Failed to allocate device vector c (error code " << cudaGetErrorString(err) << ")!" << std::endl;
@@ -336,7 +336,8 @@ void gpuDeblur(double *filter_ptr, double *filter_mirror_ptr, double *image_ptr,
     {
         std::cout << i+1 << ", " << std::flush;
         updateUnderlyingImg(d_c, d_g, d_g_m, d_f, d_tmp1, d_tmp2, d_tmp3, width, height, filter_width, filter_height, d_s, s_filter_width, s_filter_height);
-    	
+        //updateUnderlyingImg_old(d_c, d_g, d_g_m, d_f, d_tmp1, d_tmp2, width, height, filter_width, filter_height);
+	
     }
     std::cout << std::endl;
     
@@ -516,7 +517,7 @@ void runLucyRichardson(double *filter_ptr, double *filter_mirror_ptr, double *im
     for (int i=0; i<NUM_ITERATIONS; ++i)
     {
         std::cout << i+1 << ", " << std::flush;
-        updateUnderlyingImg(d_c, d_g, d_g_m, d_f, d_tmp1, d_tmp2, width, height, filter_width, filter_height);
+//        updateUnderlyingImg_old(d_c, d_g, d_g_m, d_f, d_tmp1, d_tmp2, width, height, filter_width, filter_height);
     }
     std::cout << std::endl;
 
