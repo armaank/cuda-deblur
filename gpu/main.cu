@@ -1,9 +1,7 @@
-
-
 #include <vector>
 #include <iostream>
 
-#include "gpuLucyRichardson.cu"
+#include "gpuDeblur.cu"
 #include "../benchmarks/metrics.hpp" 
 #include "../benchmarks/gputime.cu"
 #include "../utils/pngConnector.hpp"
@@ -192,13 +190,9 @@ void deblurImage(double *filter_ptr, double *filter_mirror_ptr, double *image_pt
     }
 
     std::cout << "running lucy iterations... ";
-    for (int i=0; i<NUM_ITERATIONS; ++i)
-    {
-        std::cout << i+1 << ", " << std::flush;
-        updateUnderlyingImg(d_c, d_g, d_g_m, d_f, d_tmp1, d_tmp2, d_tmp3, width, height, filter_width, filter_height, d_s, s_filter_width, s_filter_height);
-        //updateUnderlyingImg_old(d_c, d_g, d_g_m, d_f, d_tmp1, d_tmp2, width, height, filter_width, filter_height);
-	
-    }
+
+    updateUnderlyingImg(d_c, d_g, d_g_m, d_f, d_tmp1, d_tmp2, d_tmp3, width, height, filter_width, filter_height, d_s, s_filter_width, s_filter_height);
+
     std::cout << std::endl;
     
     // Copy the device result vector in device memory to the host result vector in host memory.

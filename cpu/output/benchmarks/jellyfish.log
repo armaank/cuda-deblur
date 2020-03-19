@@ -1,8 +1,0 @@
-Loading image from ../data/jellyfish_blurry.png
-Execution time: 2027359 microseconds
-PSNR: 28.8421
-Image saved to: ./output/benchmarks/jellyfish_deblur_gaussKernel3.png
-Execution time: 7142683 microseconds
-PSNR: 28.8425
-Image saved to: ./output/benchmarks/jellyfish_deblur_gaussKernel7.png
-Blurry Image PSNR: 29.9712

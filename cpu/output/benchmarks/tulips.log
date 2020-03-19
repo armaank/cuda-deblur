@@ -1,8 +1,0 @@
-Loading image from ../data/tulips_blurry.png
-Execution time: 2030114 microseconds
-PSNR: 26.57
-Image saved to: ./output/benchmarks/tulips_deblur_gaussKernel3.png
-Execution time: 7193757 microseconds
-PSNR: 26.5743
-Image saved to: ./output/benchmarks/tulips_deblur_gaussKernel7.png
-Blurry Image PSNR: 30.4895

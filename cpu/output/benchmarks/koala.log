@@ -1,8 +1,0 @@
-Loading image from ../data/koala_blurry.png
-Execution time: 2007927 microseconds
-PSNR: 22.9578
-Image saved to: ./output/benchmarks/koala_deblur_gaussKernel3.png
-Execution time: 7012458 microseconds
-PSNR: 22.9563
-Image saved to: ./output/benchmarks/koala_deblur_gaussKernel7.png
-Blurry Image PSNR: 24.8173

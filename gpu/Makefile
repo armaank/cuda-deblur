@@ -294,9 +294,9 @@ LINKLINE = $(LINK) $(OBJS) $(PNG_LIB) $(COMMONFLAGS) $(LIB_CUDA)
 
 .SUFFIXES: .c .cpp .cu .o
 
-all: gpuLucyRich
+all: gpuDeblurImage
 
-gpuLucyRich: $(OBJS) gpuDeblur.cu
+gpuDeblurImage: $(OBJS) gpuDeblur.cu
 	$(LINKLINE) -o $@
 	
 %.c.o: %.c
@@ -315,12 +315,11 @@ pngConnector.o: ../utils/pngConnector.cpp ../utils/pngConnector.hpp
 	$(CXX) $(CXXFLAGS) -c ../utils/pngConnector.cpp 
 
 ops.o: ../utils/ops.cpp ../utils/ops.hpp
-    $(CXX) $(CXXFLAGS) -c ../utils/ops.cpp
+	$(CXX) $(CXXFLAGS) -c ../utils/ops.cpp
 
 clean:
 	rm *.o 
-	rm gpuLucyRich
-
+	rm gpuDeblurImage
 
 
 

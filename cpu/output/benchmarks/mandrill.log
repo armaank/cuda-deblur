@@ -1,8 +1,0 @@
-Loading image from ../data/mandrill_blurry.png
-Execution time: 109457 microseconds
-PSNR: 20.1216
-Image saved to: ./output/benchmarks/mandrill_deblur_gaussKernel3.png
-Execution time: 346889 microseconds
-PSNR: 20.123
-Image saved to: ./output/benchmarks/mandrill_deblur_gaussKernel7.png
-Blurry Image PSNR: 23.5118

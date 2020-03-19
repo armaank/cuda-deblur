@@ -1,8 +1,0 @@
-Loading image from ../data/homes_blurry.png
-Execution time: 3263269 microseconds
-PSNR: 23.6847
-Image saved to: ./output/benchmarks/homes_deblur_gaussKernel3.png
-Execution time: 11646438 microseconds
-PSNR: 23.6838
-Image saved to: ./output/benchmarks/homes_deblur_gaussKernel7.png
-Blurry Image PSNR: 24.1942

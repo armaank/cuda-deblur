@@ -1,8 +1,0 @@
-Loading image from ../data/chrys_blurry.png
-Execution time: 1822495 microseconds
-PSNR: 25.5554
-Image saved to: ./output/benchmarks/chrys_deblur_gaussKernel3.png
-Execution time: 6523835 microseconds
-PSNR: 25.5578
-Image saved to: ./output/benchmarks/chrys_deblur_gaussKernel7.png
-Blurry Image PSNR: 29.7165

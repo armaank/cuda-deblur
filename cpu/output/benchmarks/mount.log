@@ -1,8 +1,0 @@
-Loading image from ../data/mount_blurry.png
-Execution time: 1699669 microseconds
-PSNR: 23.9173
-Image saved to: ./output/benchmarks/mount_deblur_gaussKernel3.png
-Execution time: 6108487 microseconds
-PSNR: 23.917
-Image saved to: ./output/benchmarks/mount_deblur_gaussKernel7.png
-Blurry Image PSNR: 25.3044

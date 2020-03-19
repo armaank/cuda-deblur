@@ -1,8 +1,0 @@
-Loading image from ../data/desert_blurry.png
-Execution time: 1965063 microseconds
-PSNR: 25.0262
-Image saved to: ./output/benchmarks/desert_deblur_gaussKernel3.png
-Execution time: 6812650 microseconds
-PSNR: 25.0252
-Image saved to: ./output/benchmarks/desert_deblur_gaussKernel7.png
-Blurry Image PSNR: 26.3625

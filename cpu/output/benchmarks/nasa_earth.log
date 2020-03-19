@@ -1,8 +1,0 @@
-Loading image from ../data/nasa_earth_blurry.png
-Execution time: 2342481 microseconds
-PSNR: 17.1622
-Image saved to: ./output/benchmarks/nasa_earth_deblur_gaussKernel3.png
-Execution time: 8515431 microseconds
-PSNR: 17.1633
-Image saved to: ./output/benchmarks/nasa_earth_deblur_gaussKernel7.png
-Blurry Image PSNR: 17.0475

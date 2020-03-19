@@ -1,8 +1,0 @@
-Loading image from ../data/star_blurry.png
-Execution time: 995240 microseconds
-PSNR: 20.6411
-Image saved to: ./output/benchmarks/star_deblur_gaussKernel3.png
-Execution time: 3556780 microseconds
-PSNR: 20.642
-Image saved to: ./output/benchmarks/star_deblur_gaussKernel7.png
-Blurry Image PSNR: 25.2922
