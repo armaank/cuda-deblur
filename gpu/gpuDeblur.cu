@@ -175,8 +175,8 @@ void kernel_elementWiseMultiplication(const double *A, const double *B, double *
   {
       cudaError_t err = cudaSuccess; // Error code to check return values for CUDA calls
 
-      int threadsPerBlock = 512;
-      int blocksPerGrid = 10;
+      int threadsPerBlock = 1024;
+      int blocksPerGrid = 2*65535;
 
       kernel_convolve<<<blocksPerGrid, threadsPerBlock>>>(g, f, tmp1, W, H, filter_W, filter_H);
       err = cudaGetLastError();
