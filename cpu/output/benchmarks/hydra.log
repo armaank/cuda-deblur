@@ -1,10 +1,8 @@
 Loading image from ../data/hydra_blurry.png
-Iteration number: 1, 
-Execution time: 1942962 microseconds
+Execution time: 2022903 microseconds
 PSNR: 29.2616
 Image saved to: ./output/benchmarks/hydra_deblur_gaussKernel3.png
-Iteration number: 1, 
-Execution time: 7056171 microseconds
+Execution time: 7363706 microseconds
 PSNR: 29.2631
 Image saved to: ./output/benchmarks/hydra_deblur_gaussKernel7.png
 Blurry Image PSNR: 30.2173

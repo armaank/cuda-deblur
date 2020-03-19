@@ -1,10 +1,8 @@
 Loading image from ../data/peppers_blurry.png
-Iteration number: 1, 
-Execution time: 621511 microseconds
+Execution time: 501358 microseconds
 PSNR: 27.0465
 Image saved to: ./output/benchmarks/peppers_deblur_gaussKernel3.png
-Iteration number: 1, 
-Execution time: 2161890 microseconds
+Execution time: 1811895 microseconds
 PSNR: 27.0483
 Image saved to: ./output/benchmarks/peppers_deblur_gaussKernel7.png
 Blurry Image PSNR: 30.6639

@@ -1,7 +1,4 @@
-
-
 #pragma once
-
 
 using Array  = std::vector<double>;
 using Matrix = std::vector<Array>;

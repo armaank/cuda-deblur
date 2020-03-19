@@ -5,7 +5,7 @@
 #include <limits>
 
 #include "metrics.hpp"
-#include "../cpu/ops.hpp"
+#include "../utils/ops.hpp"
 
 /* computes mean squared error between to images */
 double _mse(const Image &im1, const Image &im2)

@@ -94,7 +94,7 @@ void kernel_elementWiseMultiplication(const double *A, const double *B, double *
   *   W - Width of the image.
   */
 /*
-  void updateUnderlyingImg(const double *c, const double *g, const double *g_m, double *f, double *tmp1, double *tmp2, double *tmp3,
+  void gpuDeblur(const double *c, const double *g, const double *g_m, double *f, double *tmp1, double *tmp2, double *tmp3,
      const uint W, const uint H, const uint filter_W, const uint filter_H, const double *s, const uint s_filter_W, const uint s_filter_H)
   {
       cudaError_t err = cudaSuccess; // Error code to check return values for CUDA calls

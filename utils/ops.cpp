@@ -1,5 +1,3 @@
-/* basic image processing operations */
-
 #include <iostream>
 #include <cmath>
 #include <algorithm>
@@ -107,3 +105,55 @@ Matrix divide(const Matrix &a, const Matrix &b)
     return result;
 }
 
+double *image2ptr(const Image& input)
+{
+    int width  = input[0][0].size();
+    int height = input[0].size();
+
+    double *ptr = new (std::nothrow) double[3*height*width];
+    int idx = 0;
+    for (int i = 0; i < height; ++i)
+    {
+        for (int j =0; j < width; ++j)
+        {
+            ptr[idx++] = input[0][i][j];
+            ptr[idx++] = input[1][i][j];
+            ptr[idx++] = input[2][i][j];
+        }
+    }
+
+    return ptr;
+}
+
+
+double *matrix2ptr(const Matrix &input)
+{
+    int width  = input[0].size();
+    int height = input.size();
+
+    double *ptr = new (std::nothrow) double[height*width];
+    int idx = 0;
+    for (int i = 0; i < height; ++i)
+        for (int j =0; j < width; ++j)
+            ptr[idx++] = input[i][j];
+
+    return ptr;
+}
+
+
+Image ptr2image(const double *input, const int width, const int height)
+{
+    Image output(3, createMatrix(height, width) );
+
+    int idx = 0;
+    for (int i = 0; i < height; ++i)
+    {
+        for (int j = 0 ; j < width; ++j)
+        {
+            output[0][i][j] = input[idx++];
+            output[1][i][j] = input[idx++];
+            output[2][i][j] = input[idx++];
+        }
+    }
+    return output;
+}

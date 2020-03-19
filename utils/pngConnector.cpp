@@ -1,12 +1,8 @@
-
 #include <vector>
 #include <iostream>
 #include <png++/png.hpp>
 
-
 #include "pngConnector.hpp"
-
-
 
 Image loadImage(const std::string &filename)
 {

@@ -289,14 +289,14 @@ CFLAGS += $(COMMONFLAGS)
 LIB_CUDA := -L$(CUDA_PATH)/lib64 -lcudart
 PNG_LIB = `libpng-config --ldflags`
 
-OBJS = pngConnector.o metrics.o mainProgram.cu.o
+OBJS = pngConnector.o ops.o metrics.o main.cu.o
 LINKLINE = $(LINK) $(OBJS) $(PNG_LIB) $(COMMONFLAGS) $(LIB_CUDA)
 
 .SUFFIXES: .c .cpp .cu .o
 
 all: gpuLucyRich
 
-gpuLucyRich: $(OBJS) gpuLucyRichardson.cu
+gpuLucyRich: $(OBJS) gpuDeblur.cu
 	$(LINKLINE) -o $@
 	
 %.c.o: %.c
@@ -311,8 +311,11 @@ gpuLucyRich: $(OBJS) gpuLucyRichardson.cu
 metrics.o: ../benchmarks/metrics.cpp ../benchmarks/metrics.hpp 
 	$(CXX) $(CXXFLAGS) -c ../benchmarks/metrics.cpp
 
-pngConnector.o: pngConnector.cpp pngConnector.hpp
-	$(CXX) $(CXXFLAGS) -c pngConnector.cpp 
+pngConnector.o: ../utils/pngConnector.cpp ../utils/pngConnector.hpp
+	$(CXX) $(CXXFLAGS) -c ../utils/pngConnector.cpp 
+
+ops.o: ../utils/ops.cpp ../utils/ops.hpp
+    $(CXX) $(CXXFLAGS) -c ../utils/ops.cpp
 
 clean:
 	rm *.o 

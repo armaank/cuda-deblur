@@ -5,7 +5,7 @@
 #include <iostream>
 #include <math.h>
 
-#include "../cpu/ops.hpp"
+#include "../utils/ops.hpp"
 
 
 double _mse(const Image& image1, const Image& image2);

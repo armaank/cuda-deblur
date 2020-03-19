@@ -12,3 +12,6 @@ Matrix sharpen(const int height, const int width);
 Image conv2D(const Image &image, const Matrix &filter);
 Matrix multiply(const Matrix &a, const Matrix &b);
 Matrix divide(const Matrix &a, const Matrix &b);
+double *image2ptr(const Image &input);
+double *matrix2ptr(const Matrix &input);
+Image ptr2image(const double *input, const int width, const int height);
