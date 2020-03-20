@@ -1,15 +1,15 @@
-CC = g++ # compiler
-CXXFLAGS = -std=c++11 # flags
+CC = g++
+CXXFLAGS = -std=c++11
 PNG_LIB = `libpng-config --ldflags`
 
 make: main.cpp cpuDeblur.o benchmarks.o ops.o pngConnector.o
-	$(CC) $(CXXFLAGS) main.cpp cpuDeblur.cpp ../utils/ops.cpp ../benchmarks/metrics.cpp ../utils/pngConnector.cpp $(PNG_LIB) -o cpuDeblurImage
+	$(CC) $(CXXFLAGS) main.cpp cpuDeblur.o ops.o metrics.o pngConnector.o $(PNG_LIB) -o cpu_deblur.out
 
 debug: main.cpp cpuDeblur.o benchmarks.o ops.o
-	$(CC) $(CXXFLAGS) -g main.cpp cpuDeblur.cpp ../utils/ops.cpp ../benchmarks/metrics.cpp ../utils/pngConnector.cpp $(PNG_LIB)
+	$(CC) $(CXXFLAGS) -g main.cpp cpuDeblur.o ops.o metrics.o pngConnector.o $(PNG_LIB) -o cpu_deblur_debug.out
 
 cpuDeblur.o: cpuDeblur.cpp cpuDeblur.hpp ops.o
-	$(CC) $(CXXFLAGS) -g -c cpuDeblur.cpp ../utils/ops.cpp 
+	$(CC) $(CXXFLAGS) -c cpuDeblur.cpp ../utils/ops.cpp 
 
 ops.o: ../utils/ops.cpp ../utils/ops.hpp
 	$(CC) $(CXXFLAGS) -c ../utils/ops.cpp
@@ -21,4 +21,4 @@ pngConnector.o: ../utils/pngConnector.cpp ../utils/pngConnector.hpp
 	$(CC) $(CXXFLAGS) -c ../utils/pngConnector.cpp 
 
 clean:
-	rm *.o cpuDeblurImage 
+	rm *.o cpu_deblur.out cpu_deblur_debug.out

@@ -296,7 +296,7 @@ LINKLINE = $(LINK) $(OBJS) $(PNG_LIB) $(COMMONFLAGS) $(LIB_CUDA)
 
 all: gpuDeblurImage
 
-gpuDeblurImage: $(OBJS) gpuDeblur.cu
+gpuDeblurImage: $(OBJS) kernelFunctions.cu cpuFunctions.cu
 	$(LINKLINE) -o $@
 	
 %.c.o: %.c

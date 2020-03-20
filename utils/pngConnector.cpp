@@ -1,46 +1,53 @@
+/**
+ * pngConnector.cpp - Implementation file for the functions 
+ * that call the png++ wrapper.
+ */
+
 #include <vector>
 #include <iostream>
 #include <png++/png.hpp>
 
+#include "ops.hpp"
 #include "pngConnector.hpp"
 
+/* loads a png image file and saves it as an Image object */
 Image loadImage(const std::string &filename)
 {
-    png::image<png::rgb_pixel> in_image(filename);
-    Image imageMatrix(3, Matrix(in_image.get_height(), Array(in_image.get_width())));
+	png::image<png::rgb_pixel> in_image(filename);
 
-    int h, w;
-    for (h = 0; h < in_image.get_height(); h++)
-    {
-        for (w = 0; w < in_image.get_width(); w++)
-        {
-            imageMatrix[0][h][w] = in_image[h][w].red;
-            imageMatrix[1][h][w] = in_image[h][w].green;
-            imageMatrix[2][h][w] = in_image[h][w].blue;
-        }
-    }
-    return imageMatrix;
+	unsigned height = in_image.get_height();
+	unsigned width  = in_image.get_width();
+
+	Image imageMatrix(3, Matrix(height, Array(width)));
+
+	for (int i = 0; i < height; i++)
+		for (int j = 0; j < width; j++)
+		{
+			imageMatrix[0][i][j] = in_image[i][j].red;
+			imageMatrix[1][i][j] = in_image[i][j].green;
+			imageMatrix[2][i][j] = in_image[i][j].blue;
+		}
+
+	return imageMatrix;
 }
 
-
-void saveImage(Image &image, const std::string &filename)
+/* saves an Image object as a png file with the inputted file name */
+void saveImage(const Image &image, const std::string &filename)
 {
-    assert(image.size() == 3);
+	assert(image.size() == 3);
 
-    int height = image[0].size();
-    int width = image[0][0].size();
-    int x, y;
+	unsigned height = image[0].size();
+	unsigned width  = image[0][0].size();
 
-    png::image<png::rgb_pixel> imageFile(width, height);
+	png::image<png::rgb_pixel> imageFile(width, height);
 
-    for (y = 0; y < height; y++)
-    {
-        for (x = 0; x < width; x++)
-        {
-            imageFile[y][x].red = image[0][y][x];
-            imageFile[y][x].green = image[1][y][x];
-            imageFile[y][x].blue = image[2][y][x];
-        }
-    }
-    imageFile.write(filename);
+	for (int i = 0; i < height; i++)
+		for (int j = 0; j < width; j++)
+		{
+			imageFile[i][j].red   = image[0][i][j];
+			imageFile[i][j].green = image[1][i][j];
+			imageFile[i][j].blue  = image[2][i][j];
+		}
+
+	imageFile.write(filename);
 }
