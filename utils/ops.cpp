@@ -99,7 +99,7 @@ Matrix divide(const Matrix &a, const Matrix &b)
     for (int i = 0; i < result.size(); i++)
         for (int j = 0; j < result[0].size(); j++)
         {
-                result[i][j] = b[i][j] == 0 ? 1 : a[i][j] / b[i][j];
+            result[i][j] = b[i][j] == 0 ? 1 : a[i][j] / b[i][j];
         }
 
     return result;

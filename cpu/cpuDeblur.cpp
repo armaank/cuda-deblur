@@ -18,7 +18,7 @@ Image rlDeconv(const Image &image, const Matrix &filter, const int n_iter)
     int filt_width = filter[0].size();
 
     /* compute and store mirrored psf */
-    
+
     Matrix filter_m(filt_length, Array(filt_width));
     for (int i = 0; i < filt_length; i++)
         for (int j = 0; j < filt_width; j++)
@@ -38,22 +38,22 @@ Image rlDeconv(const Image &image, const Matrix &filter, const int n_iter)
         for (int d = 0; d < 3; d++) /* element-wise multiply to update deblurred image */
             im_deconv[d] = multiply(tmp2[d], im_deconv[d]);
     }
-   
+
     return im_deconv;
 }
 
 /* image deblurring algorithm */
 Image cpuDeblur(const Image &image, const Matrix &filter)
 {
-	/* perform lucy-richardson deconvolution */
-	
+    /* perform lucy-richardson deconvolution */
+
     const int n_iter = 1;
-	Image im_deconv = rlDeconv(image, filter, n_iter);
-	
+    Image im_deconv = rlDeconv(image, filter, n_iter);
+
     /* apply sharpening filter */
-	
+
     Matrix s_filter = sharpen(3,3);
-	Image im_deblur = conv2D(im_deconv, s_filter);
-	
-	return im_deblur;	
+    Image im_deblur = conv2D(im_deconv, s_filter);
+
+    return im_deblur;
 }

@@ -2,13 +2,13 @@
 #include <iostream>
 
 #include "gpuDeblur.cu"
-#include "../benchmarks/metrics.hpp" 
+#include "../benchmarks/metrics.hpp"
 #include "../benchmarks/gputime.cu"
 #include "../utils/pngConnector.hpp"
-#include "../utils/ops.hpp" 
+#include "../utils/ops.hpp"
 
 void deblurImage(double *filter_ptr, double *filter_mirror_ptr, double *image_ptr, double *output_ptr,
-    const Image &target_image, const std::string &output_file, int filter_width, int filter_height, double *s_filter_ptr, int s_filter_width, int s_filter_height);
+                 const Image &target_image, const std::string &output_file, int filter_width, int filter_height, double *s_filter_ptr, int s_filter_width, int s_filter_height);
 
 int main(int argc, char **argv)
 {
@@ -35,27 +35,27 @@ int main(int argc, char **argv)
 
     // Kernel: gaussian 3x3
     Matrix filter = gaussian(3, 3, 1);
-    int filter_width  = filter[0].size(); 
-    int filter_height = filter.size(); 
+    int filter_width  = filter[0].size();
+    int filter_height = filter.size();
     Matrix filter_m = createMatrix(filter_height, filter_width);
     for (int i = 0; i < filter_height; i++)
         for (int j = 0; j < filter_width; j++)
             filter_m[i][j] = filter[j][i];
-    
+
     Matrix s_filter = sharpen(3,3);
     int s_filter_width = s_filter[0].size();
     int s_filter_height = s_filter.size();
-    
 
-    double *filter_ptr = matrix2ptr(filter);    
+
+    double *filter_ptr = matrix2ptr(filter);
     double *filter_mirror_ptr = matrix2ptr(filter_m);
     double *s_filter_ptr = matrix2ptr(s_filter);
 
     deblurImage(filter_ptr, filter_mirror_ptr, image_ptr, output_ptr, target_image, output_file + "_gaussKernel3"+".png", filter_width, filter_height, s_filter_ptr, s_filter_width, s_filter_height);
 
-    
+
     std::cout << "Done!" << std::endl;
-    
+
     /////////////////////////////////////////////////////////////////////////
 
 
@@ -65,7 +65,7 @@ int main(int argc, char **argv)
 
 
 void deblurImage(double *filter_ptr, double *filter_mirror_ptr, double *image_ptr, double *output_ptr,
-    const Image &target_image, const std::string &output_file, int filter_width, int filter_height, double *s_filter_ptr, int s_filter_width, int s_filter_height)
+                 const Image &target_image, const std::string &output_file, int filter_width, int filter_height, double *s_filter_ptr, int s_filter_width, int s_filter_height)
 {
     /* initalize gpu timers */
     GpuTimer gputime_gpu;
@@ -97,7 +97,7 @@ void deblurImage(double *filter_ptr, double *filter_mirror_ptr, double *image_pt
         exit(EXIT_FAILURE);
     }
 
-	
+
     // Allocate the device input vector g_m
     double *d_g_m = NULL;
     err = cudaMalloc((void **)&d_g_m, size);
@@ -116,7 +116,7 @@ void deblurImage(double *filter_ptr, double *filter_mirror_ptr, double *image_pt
         exit(EXIT_FAILURE);
     }
 
-    
+
     // Allocate the device output vector c
     double *d_c = NULL;
     err = cudaMalloc((void **)&d_c, size);
@@ -156,14 +156,14 @@ void deblurImage(double *filter_ptr, double *filter_mirror_ptr, double *image_pt
         exit(EXIT_FAILURE);
     }
 
-	
+
     err = cudaMemcpy(d_c, image_ptr, size, cudaMemcpyHostToDevice);
     if (err != cudaSuccess)
     {
         fprintf(stderr, "Failed to copy vector c from host to device (error code %s)!\n", cudaGetErrorString(err));
         exit(EXIT_FAILURE);
     }
-   
+
     // allocate the temporary gpu memory
     double *d_tmp1 = NULL;
     err = cudaMalloc((void **)&d_tmp1, size);
@@ -180,7 +180,7 @@ void deblurImage(double *filter_ptr, double *filter_mirror_ptr, double *image_pt
         fprintf(stderr, "Failed to allocate device vector tmp2 (error code %s)!\n", cudaGetErrorString(err));
         exit(EXIT_FAILURE);
     }
-    
+
     double *d_tmp3 = NULL;
     err = cudaMalloc((void **)&d_tmp3, size);
     if (err != cudaSuccess)
@@ -194,7 +194,7 @@ void deblurImage(double *filter_ptr, double *filter_mirror_ptr, double *image_pt
     gpuDeblur(d_c, d_g, d_g_m, d_f, d_tmp1, d_tmp2, d_tmp3, width, height, filter_width, filter_height, d_s, s_filter_width, s_filter_height);
 
     std::cout << std::endl;
-    
+
     // Copy the device result vector in device memory to the host result vector in host memory.
     std::cout << "Copy output data from the CUDA device to the host memory" << std::endl;
     err = cudaMemcpy(output_ptr, d_f, size, cudaMemcpyDeviceToHost);
@@ -232,7 +232,7 @@ void deblurImage(double *filter_ptr, double *filter_mirror_ptr, double *image_pt
         std::cerr << "Failed to free device vector g_m (error code " << cudaGetErrorString(err) << ")!" << std::endl;
         exit(EXIT_FAILURE);
     }
-    
+
     err = cudaFree(d_tmp1);
     if (err != cudaSuccess)
     {
