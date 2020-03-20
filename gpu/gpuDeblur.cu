@@ -1,4 +1,3 @@
-   
 #include <iostream>
 
 
@@ -85,92 +84,16 @@ void kernel_elementWiseMultiplication(const double *A, const double *B, double *
 /////////////////////////////////////////////////////////////////////////////////
 
 /**
-  * updateUnderlyingImg - Executes a Lucy-Richardson iteration to get an updated
-  * underlying image (updates the values of f).
+  * gpuDeblur - Executes a Lucy-Richardson iteration to get an updated
+  * underlying image (updates the values of f) and applies a sharpening filter to the result
   *   c - The blurred image.
   *   g - The PSF.
   *   f - The underlying image we are trying to recover.
   *   H - Height of the image.
   *   W - Width of the image.
   */
-/*
-  void gpuDeblur(const double *c, const double *g, const double *g_m, double *f, double *tmp1, double *tmp2, double *tmp3,
-     const uint W, const uint H, const uint filter_W, const uint filter_H, const double *s, const uint s_filter_W, const uint s_filter_H)
-  {
-      cudaError_t err = cudaSuccess; // Error code to check return values for CUDA calls
 
-      int threadsPerBlock = 512;
-      int blocksPerGrid = 10;
-
-      kernel_convolve<<<blocksPerGrid, threadsPerBlock>>>(g, f, tmp1, W, H, filter_W, filter_H);
-      err = cudaGetLastError();
-      if (err != cudaSuccess)
-      {
-          std::cerr << "Failed to launch kernel_convolve kernel (error code " << cudaGetErrorString(err) << ")!\n";
-          exit(EXIT_FAILURE);
-      }
-
-      kernel_elementWiseDivision<<<blocksPerGrid, threadsPerBlock>>>(c, tmp1, tmp2, W, H);
-      err = cudaGetLastError();
-      if (err != cudaSuccess)
-      {
-          std::cerr << "Failed to launch kernel_elementWiseDivision kernel (error code " << cudaGetErrorString(err) << ")!\n";
-          exit(EXIT_FAILURE);
-      }
-
-      kernel_convolve<<<blocksPerGrid, threadsPerBlock>>>(g_m, tmp2, tmp1, W, H, filter_W, filter_H);
-      err = cudaGetLastError();
-      if (err != cudaSuccess)
-      {
-          std::cerr << "Failed to launch kernel_convolve kernel (error code " << cudaGetErrorString(err) << ")!\n";
-          exit(EXIT_FAILURE);
-      }
-
-	 kernel_elementWiseMultiplication<<<blocksPerGrid, threadsPerBlock>>>(tmp1, f, tmp2, W, H);
-      err = cudaGetLastError();
-      if (err != cudaSuccess)
-      {
-          std::cerr << "Failed to launch kernel_elementWiseMultiplication kernel (error code " << cudaGetErrorString(err) << ")!" << std::endl;
-          exit(EXIT_FAILURE);
-      }
-
-
-      kernel_internalMemcpy<<<blocksPerGrid, threadsPerBlock>>>(f, tmp2, W, H);
-      err = cudaGetLastError();
-      if (err != cudaSuccess)
-      {
-          std::cerr << "Failed to launch kernel_internalMemcpy kernel (error code " << cudaGetErrorString(err) << ")!" << std::endl;
-          exit(EXIT_FAILURE);
-      }
-  }
-
-
-
-      kernel_elementWiseMultiplication<<<blocksPerGrid, threadsPerBlock>>>(tmp1, f, tmp2, W, H);
-      err = cudaGetLastError();
-      if (err != cudaSuccess)
-      {
-          std::cerr << "Failed to launch kernel_elementWiseMultiplication kernel (error code " << cudaGetErrorString(err) << ")!" << std::endl;
-          exit(EXIT_FAILURE);
-      }
-
-      kernel_convolve<<<blocksPerGrid, threadsPerBlock>>>(tmp2, s, tmp1, W, H, s_filter_W, s_filter_H);
-      err = cudaGetLastError();
-      if (err != cudaSuccess)
-      {
-          std::cerr << "Failed to launch kernel_convolve kernel (error code " << cudaGetErrorString(err) << ")!" << std::endl;
-          exit(EXIT_FAILURE);
-      }
-      kernel_internalMemcpy<<<blocksPerGrid, threadsPerBlock>>>(f, tmp2, W, H);
-      err = cudaGetLastError();
-      if (err != cudaSuccess)
-      {
-          std::cerr << "Failed to launch kernel_internalMemcpy kernel (error code " << cudaGetErrorString(err) << ")!" << std::endl;
-          exit(EXIT_FAILURE);
-      }
-  }
-*/
- void updateUnderlyingImg(const double *c, const double *g, const double *g_m, double *f, double *tmp1, double *tmp2, double *tmp3,
+ void gpuDeblur(const double *c, const double *g, const double *g_m, double *f, double *tmp1, double *tmp2, double *tmp3,
      const uint W, const uint H, const uint filter_W, const uint filter_H, const double *s, const uint s_filter_W, const uint s_filter_H)
   {
       cudaError_t err = cudaSuccess; // Error code to check return values for CUDA calls

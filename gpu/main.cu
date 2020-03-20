@@ -191,7 +191,7 @@ void deblurImage(double *filter_ptr, double *filter_mirror_ptr, double *image_pt
 
     std::cout << "running lucy iterations... ";
 
-    updateUnderlyingImg(d_c, d_g, d_g_m, d_f, d_tmp1, d_tmp2, d_tmp3, width, height, filter_width, filter_height, d_s, s_filter_width, s_filter_height);
+    gpuDeblur(d_c, d_g, d_g_m, d_f, d_tmp1, d_tmp2, d_tmp3, width, height, filter_width, filter_height, d_s, s_filter_width, s_filter_height);
 
     std::cout << std::endl;
     
