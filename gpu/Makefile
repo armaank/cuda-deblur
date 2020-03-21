@@ -294,9 +294,9 @@ LINKLINE = $(LINK) $(OBJS) $(PNG_LIB) $(COMMONFLAGS) $(LIB_CUDA)
 
 .SUFFIXES: .c .cpp .cu .o
 
-all: gpuDeblurImage
+all: gpu_deblur.out
 
-gpuDeblurImage: $(OBJS) kernelFunctions.cu cpuFunctions.cu
+gpu_deblur.out: $(OBJS) kernelFunctions.cu cpuFunctions.cu
 	$(LINKLINE) -o $@
 	
 %.c.o: %.c
@@ -319,7 +319,7 @@ ops.o: ../utils/ops.cpp ../utils/ops.hpp
 
 clean:
 	rm *.o 
-	rm gpuDeblurImage
+	rm gpu_deblur.out
 
 
 

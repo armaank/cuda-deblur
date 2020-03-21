@@ -1,0 +1,6 @@
+Loading image from../data/star_blurry.png
+Total time Elapsed - GPU: 744.531 ms
+Baseline PSNR: 25.2922
+Our algorithm's PSNR: 20.6411
+Image saved to: ./output/benchmarks/star_deblur_gaussKernel3.png
+Done!

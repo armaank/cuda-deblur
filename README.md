@@ -18,10 +18,10 @@ make install
 
 ## Running
 Now you can run the CPU and/or GPU implementation. 
-To do so, go to the CPU and/or GPU directories, and call $make$ followed by the executable. 
+To do so, go to the CPU and/or GPU directories, and call `make` followed by the executable. 
 The executable takes in 3 arguments: the blurry image, the image output file name, and the original image. 
 This all looks like the following (when inside either the CPU or GPU directories):
 ```sh
 make
-./gpuLucyRich BLURRED_IMAGE OUTPUT_IMAGE_NAME ORIGINAL_IMAGE
+./gpu_deblur.out BLURRED_IMAGE OUTPUT_IMAGE_NAME ORIGINAL_IMAGE
 ```

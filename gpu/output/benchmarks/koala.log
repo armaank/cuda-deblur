@@ -1,0 +1,6 @@
+Loading image from../data/koala_blurry.png
+Total time Elapsed - GPU: 613.158 ms
+Baseline PSNR: 24.8173
+Our algorithm's PSNR: 22.9578
+Image saved to: ./output/benchmarks/koala_deblur_gaussKernel3.png
+Done!

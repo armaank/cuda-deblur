@@ -1,0 +1,6 @@
+Loading image from../data/jellyfish_blurry.png
+Total time Elapsed - GPU: 610.032 ms
+Baseline PSNR: 29.9712
+Our algorithm's PSNR: 28.8421
+Image saved to: ./output/benchmarks/jellyfish_deblur_gaussKernel3.png
+Done!

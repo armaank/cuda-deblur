@@ -1,0 +1,5 @@
+Loading image from ../data/hydra_blurry.png
+Blurry Image (baseline) PSNR: 30.2173
+Execution time: 4947118 microseconds
+Our Algorithm's PSNR: 29.2616
+Image saved to: ./output/benchmarks/hydra_deblur_gaussKernel3.png

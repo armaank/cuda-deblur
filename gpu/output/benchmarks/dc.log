@@ -1,0 +1,6 @@
+Loading image from../data/dc_blurry.png
+Total time Elapsed - GPU: 630.991 ms
+Baseline PSNR: 24.612
+Our algorithm's PSNR: 24.0545
+Image saved to: ./output/benchmarks/dc_deblur_gaussKernel3.png
+Done!

@@ -1,0 +1,5 @@
+Loading image from ../data/jellyfish_blurry.png
+Blurry Image (baseline) PSNR: 29.9712
+Execution time: 4951987 microseconds
+Our Algorithm's PSNR: 28.8421
+Image saved to: ./output/benchmarks/jellyfish_deblur_gaussKernel3.png

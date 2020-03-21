@@ -1,0 +1,6 @@
+Loading image from../data/mount_blurry.png
+Total time Elapsed - GPU: 519.559 ms
+Baseline PSNR: 25.3044
+Our algorithm's PSNR: 23.9173
+Image saved to: ./output/benchmarks/mount_deblur_gaussKernel3.png
+Done!

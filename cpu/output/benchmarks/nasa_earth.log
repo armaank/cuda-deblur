@@ -1,0 +1,5 @@
+Loading image from ../data/nasa_earth_blurry.png
+Blurry Image (baseline) PSNR: 17.0475
+Execution time: 5681368 microseconds
+Our Algorithm's PSNR: 17.1622
+Image saved to: ./output/benchmarks/nasa_earth_deblur_gaussKernel3.png

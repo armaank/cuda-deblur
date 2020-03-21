@@ -1,0 +1,5 @@
+Loading image from ../data/peppers_blurry.png
+Blurry Image (baseline) PSNR: 30.6639
+Execution time: 1228295 microseconds
+Our Algorithm's PSNR: 27.0465
+Image saved to: ./output/benchmarks/peppers_deblur_gaussKernel3.png

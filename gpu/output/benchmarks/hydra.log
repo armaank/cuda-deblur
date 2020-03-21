@@ -1,0 +1,6 @@
+Loading image from../data/hydra_blurry.png
+Total time Elapsed - GPU: 471.511 ms
+Baseline PSNR: 30.2173
+Our algorithm's PSNR: 29.2616
+Image saved to: ./output/benchmarks/hydra_deblur_gaussKernel3.png
+Done!

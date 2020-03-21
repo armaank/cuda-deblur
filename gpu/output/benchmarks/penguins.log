@@ -1,0 +1,6 @@
+Loading image from../data/penguins_blurry.png
+Total time Elapsed - GPU: 523.332 ms
+Baseline PSNR: 25.4573
+Our algorithm's PSNR: 22.1359
+Image saved to: ./output/benchmarks/penguins_deblur_gaussKernel3.png
+Done!

@@ -1,0 +1,5 @@
+Loading image from ../data/star_blurry.png
+Blurry Image (baseline) PSNR: 25.2922
+Execution time: 2436836 microseconds
+Our Algorithm's PSNR: 20.6411
+Image saved to: ./output/benchmarks/star_deblur_gaussKernel3.png

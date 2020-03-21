@@ -1,0 +1,6 @@
+Loading image from../data/homes_blurry.png
+Total time Elapsed - GPU: 1059.04 ms
+Baseline PSNR: 24.1942
+Our algorithm's PSNR: 23.6847
+Image saved to: ./output/benchmarks/homes_deblur_gaussKernel3.png
+Done!

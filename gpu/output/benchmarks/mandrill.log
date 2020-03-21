@@ -1,0 +1,6 @@
+Loading image from../data/mandrill_blurry.png
+Total time Elapsed - GPU: 427.329 ms
+Baseline PSNR: 23.5118
+Our algorithm's PSNR: 20.1216
+Image saved to: ./output/benchmarks/mandrill_deblur_gaussKernel3.png
+Done!

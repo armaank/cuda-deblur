@@ -1,0 +1,5 @@
+Loading image from ../data/tulips_blurry.png
+Blurry Image (baseline) PSNR: 30.4895
+Execution time: 4943376 microseconds
+Our Algorithm's PSNR: 26.57
+Image saved to: ./output/benchmarks/tulips_deblur_gaussKernel3.png

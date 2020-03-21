@@ -1,0 +1,5 @@
+Loading image from ../data/penguins_blurry.png
+Blurry Image (baseline) PSNR: 25.4573
+Execution time: 4947341 microseconds
+Our Algorithm's PSNR: 22.1359
+Image saved to: ./output/benchmarks/penguins_deblur_gaussKernel3.png

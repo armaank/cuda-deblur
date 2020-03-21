@@ -1,0 +1,6 @@
+Loading image from../data/lighthouse_blurry.png
+Total time Elapsed - GPU: 700.394 ms
+Baseline PSNR: 27.3851
+Our algorithm's PSNR: 24.6796
+Image saved to: ./output/benchmarks/lighthouse_deblur_gaussKernel3.png
+Done!

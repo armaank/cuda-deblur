@@ -1,0 +1,5 @@
+Loading image from ../data/lighthouse_blurry.png
+Blurry Image (baseline) PSNR: 27.3851
+Execution time: 4948627 microseconds
+Our Algorithm's PSNR: 24.6796
+Image saved to: ./output/benchmarks/lighthouse_deblur_gaussKernel3.png

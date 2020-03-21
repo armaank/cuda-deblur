@@ -1,0 +1,5 @@
+Loading image from ../data/mandrill_blurry.png
+Blurry Image (baseline) PSNR: 23.5118
+Execution time: 248457 microseconds
+Our Algorithm's PSNR: 20.1216
+Image saved to: ./output/benchmarks/mandrill_deblur_gaussKernel3.png

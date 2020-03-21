@@ -1,0 +1,5 @@
+Loading image from ../data/homes_blurry.png
+Blurry Image (baseline) PSNR: 24.1942
+Execution time: 8227381 microseconds
+Our Algorithm's PSNR: 23.6847
+Image saved to: ./output/benchmarks/homes_deblur_gaussKernel3.png

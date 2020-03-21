@@ -1,0 +1,80 @@
+Loading image from ../data/beach_blurry.png
+Blurry Image (baseline) PSNR: 29.7274
+Execution time: 7768133 microseconds
+Our Algorithm's PSNR: 24.0045
+Image saved to: ./output/benchmarks/beach_deblur_gaussKernel3.png
+Loading image from ../data/chrys_blurry.png
+Blurry Image (baseline) PSNR: 29.7165
+Execution time: 4940661 microseconds
+Our Algorithm's PSNR: 25.5554
+Image saved to: ./output/benchmarks/chrys_deblur_gaussKernel3.png
+Loading image from ../data/dc_blurry.png
+Blurry Image (baseline) PSNR: 24.612
+Execution time: 4587115 microseconds
+Our Algorithm's PSNR: 24.0545
+Image saved to: ./output/benchmarks/dc_deblur_gaussKernel3.png
+Loading image from ../data/desert_blurry.png
+Blurry Image (baseline) PSNR: 26.3625
+Execution time: 4942647 microseconds
+Our Algorithm's PSNR: 25.0262
+Image saved to: ./output/benchmarks/desert_deblur_gaussKernel3.png
+Loading image from ../data/homes_blurry.png
+Blurry Image (baseline) PSNR: 24.1942
+Execution time: 8227381 microseconds
+Our Algorithm's PSNR: 23.6847
+Image saved to: ./output/benchmarks/homes_deblur_gaussKernel3.png
+Loading image from ../data/hydra_blurry.png
+Blurry Image (baseline) PSNR: 30.2173
+Execution time: 4947118 microseconds
+Our Algorithm's PSNR: 29.2616
+Image saved to: ./output/benchmarks/hydra_deblur_gaussKernel3.png
+Loading image from ../data/jellyfish_blurry.png
+Blurry Image (baseline) PSNR: 29.9712
+Execution time: 4951987 microseconds
+Our Algorithm's PSNR: 28.8421
+Image saved to: ./output/benchmarks/jellyfish_deblur_gaussKernel3.png
+Loading image from ../data/koala_blurry.png
+Blurry Image (baseline) PSNR: 24.8173
+Execution time: 4952489 microseconds
+Our Algorithm's PSNR: 22.9578
+Image saved to: ./output/benchmarks/koala_deblur_gaussKernel3.png
+Loading image from ../data/lighthouse_blurry.png
+Blurry Image (baseline) PSNR: 27.3851
+Execution time: 4948627 microseconds
+Our Algorithm's PSNR: 24.6796
+Image saved to: ./output/benchmarks/lighthouse_deblur_gaussKernel3.png
+Loading image from ../data/mandrill_blurry.png
+Blurry Image (baseline) PSNR: 23.5118
+Execution time: 248457 microseconds
+Our Algorithm's PSNR: 20.1216
+Image saved to: ./output/benchmarks/mandrill_deblur_gaussKernel3.png
+Loading image from ../data/mount_blurry.png
+Blurry Image (baseline) PSNR: 25.3044
+Execution time: 4142590 microseconds
+Our Algorithm's PSNR: 23.9173
+Image saved to: ./output/benchmarks/mount_deblur_gaussKernel3.png
+Loading image from ../data/nasa_earth_blurry.png
+Blurry Image (baseline) PSNR: 17.0475
+Execution time: 5681368 microseconds
+Our Algorithm's PSNR: 17.1622
+Image saved to: ./output/benchmarks/nasa_earth_deblur_gaussKernel3.png
+Loading image from ../data/penguins_blurry.png
+Blurry Image (baseline) PSNR: 25.4573
+Execution time: 4947341 microseconds
+Our Algorithm's PSNR: 22.1359
+Image saved to: ./output/benchmarks/penguins_deblur_gaussKernel3.png
+Loading image from ../data/peppers_blurry.png
+Blurry Image (baseline) PSNR: 30.6639
+Execution time: 1228295 microseconds
+Our Algorithm's PSNR: 27.0465
+Image saved to: ./output/benchmarks/peppers_deblur_gaussKernel3.png
+Loading image from ../data/star_blurry.png
+Blurry Image (baseline) PSNR: 25.2922
+Execution time: 2436836 microseconds
+Our Algorithm's PSNR: 20.6411
+Image saved to: ./output/benchmarks/star_deblur_gaussKernel3.png
+Loading image from ../data/tulips_blurry.png
+Blurry Image (baseline) PSNR: 30.4895
+Execution time: 4943376 microseconds
+Our Algorithm's PSNR: 26.57
+Image saved to: ./output/benchmarks/tulips_deblur_gaussKernel3.png

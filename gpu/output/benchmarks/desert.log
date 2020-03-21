@@ -1,0 +1,6 @@
+Loading image from../data/desert_blurry.png
+Total time Elapsed - GPU: 619.091 ms
+Baseline PSNR: 26.3625
+Our algorithm's PSNR: 25.0262
+Image saved to: ./output/benchmarks/desert_deblur_gaussKernel3.png
+Done!

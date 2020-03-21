@@ -1,0 +1,5 @@
+Loading image from ../data/koala_blurry.png
+Blurry Image (baseline) PSNR: 24.8173
+Execution time: 4952489 microseconds
+Our Algorithm's PSNR: 22.9578
+Image saved to: ./output/benchmarks/koala_deblur_gaussKernel3.png

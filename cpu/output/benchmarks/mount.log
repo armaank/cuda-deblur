@@ -1,0 +1,5 @@
+Loading image from ../data/mount_blurry.png
+Blurry Image (baseline) PSNR: 25.3044
+Execution time: 4142590 microseconds
+Our Algorithm's PSNR: 23.9173
+Image saved to: ./output/benchmarks/mount_deblur_gaussKernel3.png

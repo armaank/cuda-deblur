@@ -1,0 +1,5 @@
+Loading image from ../data/chrys_blurry.png
+Blurry Image (baseline) PSNR: 29.7165
+Execution time: 4940661 microseconds
+Our Algorithm's PSNR: 25.5554
+Image saved to: ./output/benchmarks/chrys_deblur_gaussKernel3.png

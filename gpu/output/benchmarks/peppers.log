@@ -1,0 +1,6 @@
+Loading image from../data/peppers_blurry.png
+Total time Elapsed - GPU: 442.541 ms
+Baseline PSNR: 30.6639
+Our algorithm's PSNR: 27.0465
+Image saved to: ./output/benchmarks/peppers_deblur_gaussKernel3.png
+Done!

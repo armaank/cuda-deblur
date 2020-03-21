@@ -1,0 +1,6 @@
+Loading image from../data/chrys_blurry.png
+Total time Elapsed - GPU: 891.019 ms
+Baseline PSNR: 29.7165
+Our algorithm's PSNR: 25.5554
+Image saved to: ./output/benchmarks/chrys_deblur_gaussKernel3.png
+Done!
