@@ -24,19 +24,17 @@ int main(int argc, char **argv)
 	std::cout << "Loading image from " << input_file << std::endl;
 	Image image = loadImage(input_file);
 	Image target_image = loadImage(target_file);
+	
+        /////////////////////////////////////////////////////////////////////////
 
 	// baseline psnr calculation
 	std::cout << "Blurry Image (baseline) PSNR: " << psnr(image, target_image) << std::endl;
-
-	/////////////////////////////////////////////////////////////////////////
-	// Kernel: gaussian 3x3
+	
+	// deblur w/ a 3x3 gaussian kernel
 	Matrix filter = gaussian(3, 3, 1);
 	deblurImage(filter, image, target_image, output_file + "_gaussKernel3" + ".png");
 
-	// Kernel: gaussian 7x7
-	filter = gaussian(7, 7, 1);
-	deblurImage(filter, image, target_image, output_file + "_gaussKernel7" + ".png");
-	/////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////
 
 	return 0;
 }
